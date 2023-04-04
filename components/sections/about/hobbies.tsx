@@ -8,7 +8,7 @@ const Hobbies=()=>{
             <h3 className="uppercase bg-tertiary1 px-2 text-secondary1 font-bold inline py-1 min-w-max">
                 Loves to:
             </h3>
-            <div className="grid text-center grid-cols-[repeat(auto-fit,12rem)] justify-center">
+            <div className="grid text-center grid-cols-[repeat(auto-fit,8rem)] justify-center items-start">
                 <IconWrapper icon={<FaLaptopCode />} title="Code" />
                 <IconWrapper icon={< FaAppStore/>} title="Create websites and applications" />
                 <IconWrapper icon={<FaChessKing />} title="Play Chess" />
