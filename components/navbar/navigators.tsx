@@ -5,7 +5,7 @@ import { RiFileList2Line } from "react-icons/ri";
 import { BiGitRepoForked, BiPaperPlane } from "react-icons/bi";
 const Navigators=()=>{
     return (
-        <Card className="flex lg:flex-col h-min py-4 lg:py-6 items-center lg:space-y-2 mr-4 lg:mr-0">
+        <Card className="flex lg:flex-col h-min py-4 lg:py-6 items-center lg:space-y-2 mr-4 lg:mr-0 w-full">
             <LinkIconWrapper
                 title="About"
                 icon={<IoPersonOutline />}
