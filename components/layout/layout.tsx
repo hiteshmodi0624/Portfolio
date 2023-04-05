@@ -8,7 +8,7 @@ const Layout:FC<PropsWithChildren>=(props)=>{
         >
             <main
                 className="grid grid-cols-[minmax(min-content,500px)] pt-28 lg:pt-2
-                            lg:grid-cols-[72px_minmax(min-content,500px)_1fr] w-full h-full gap-2 z-10 justify-center"
+                            lg:grid-cols-[72px_minmax(min-content,400px)_1fr] w-full h-full gap-2 z-10 justify-center"
             >
                 {props.children}
             </main>
