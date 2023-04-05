@@ -21,7 +21,7 @@ const resumeData = {
     education: [
         {
             company: "National Institute of Technology, Kurukshetra",
-            position: "Electrical Engineering",
+            position: "BTech",
             time: "2020 - 2024",
             description: [`Current CGPA:8.88`,'Member of Embedded-System and Robotics club.'],
             current:+(new Date().getFullYear())<=2024,
