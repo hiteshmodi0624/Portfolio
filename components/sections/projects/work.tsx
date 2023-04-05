@@ -10,7 +10,7 @@ const Work:FC<{work:work}>=({work})=>{
     else
         bg='bg-secondary2 border-secondary2'
     return (
-        <Link href={work.link} className={`relative rounded-full overflow-hidden h-48 w-48 flex 
+        <Link href={work.link} target="_blank" className={`relative rounded-full overflow-hidden h-48 w-48 flex 
                     items-center text-center justify-center border-2 hover:border-tertiary2 dark:hover:border-tertiary1  p-6 ${bg}`}>
             <Image
                 src={work.image}
