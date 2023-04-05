@@ -68,7 +68,7 @@ const Form: FC<{
                     <div className="flex justify-start w-full pt-4">
                         <button
                             type="submit"
-                            disabled={email.isInvalid||name.isInvalid||message.isInvalid}
+                            disabled={(email.isInvalid&&email.isChanged)||(name.isInvalid&&name.isChanged)||(message.isInvalid&&message.isChanged)}
                             className="flex items-center group space-x-2 enabled:hover:text-tertiary2 enabled:dark:hover:text-tertiary1 
                             active:translate-y-0.5 duration-500  disabled:cursor-not-allowed disabled:opacity-25"
                         >
