@@ -4,7 +4,7 @@ import ProfileData from "../profile/profile-data";
 const Profile = () => {
     return (
         <Card
-            className="before:absolute before:-left-3 before:-top-3 lg:before:w-full lg:before:h-full 
+            className="before:absolute mx-4 lg:mx-0 w-11/12 lg:w-full before:-left-3 before:-top-3 lg:before:w-full lg:before:h-full 
           before:bg-tertiary2 before:opacity-10 before:rounded-md before:-z-10 relative shadow-2xl"
         >
             <div className="overflow-hidden w-full h-[48rem] lg:h-full flex flex-col items-center">

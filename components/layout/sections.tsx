@@ -6,7 +6,7 @@ import TechStack from "../sections/resume/tech-stack";
 import Card from "../ui/card";
 
 const Sections = () => {
-    return <Card className="my-6 lg:-translate-x-2 -z-10 overflow-y-scroll">
+    return <Card className="my-6 mx-4 lg:mx-0 w-11/12 lg:w-full  lg:-translate-x-2 -z-10 overflow-y-scroll">
         <About/>
         <Resume/>
         <TechStack/>
