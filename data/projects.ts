@@ -37,7 +37,7 @@ export const works:work[]=[
     {
         name: "Nathead",
         image: "/images/works/nathead.webp",
-        link: "https://aimersinternational.com/",
+        link: "https://nathead.com/",
         background:"dark"
 
     },

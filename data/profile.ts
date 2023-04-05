@@ -8,12 +8,12 @@ const profileData={
     ],
     name:"Hitesh Modi",
     links:{
-        resume:"",
-        github:"",
-        linkedIn:"",
-        twitter:"",
-        instagram:"",
-        email:"",
+        resume:"https://drive.google.com/file/d/1ICaJ8Y_MqiH1mFr226WENrmY-t-l0K-P/edit",
+        github:"https://www.github.com/hiteshmodi0624",
+        linkedIn:"https://www.linkedIn.com/in/hiteshmodi0624",
+        twitter:"https://www.twitter.com/hiteshmodi_",
+        instagram:"https://www.instagram.com/hiteshmodi__/",
+        email:"mailto:mail@hiteshmodi.in",
     }
 }
 export default profileData

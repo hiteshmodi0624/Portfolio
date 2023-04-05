@@ -7,7 +7,7 @@ import { links } from "@/data/profile";
 const SocialIcons:FC<{links:links}>=({links})=>{
     return (
         <IconContext.Provider value={{ color: "currentColor", size: "15" }}>
-            <div className="flex space-x-5 mt-4 text-primary2 justify-center">
+            <div className="flex space-x-5 mt-4 text-secondary1 dark:text-primary2 justify-center">
                 <IconWrapper noBottom={true} icon={<BsGithub/>}  link={links.github}/>
                 <IconWrapper noBottom={true} icon={<BsTwitter />} link={links.twitter}/>
                 <IconWrapper noBottom={true} icon={<BsLinkedin />} link={links.linkedIn}/>

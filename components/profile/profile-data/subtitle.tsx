@@ -3,7 +3,7 @@ import TypewriterComponent from "typewriter-effect"
 
 const Subtitle:FC<{subtitle:string[]}>=({subtitle})=>{
     return (
-        <div className="text-tertiary1 w-full">
+        <div className="dark:text-tertiary1 text-tertiary2 w-full">
             <TypewriterComponent
                 options={{
                     strings: subtitle,

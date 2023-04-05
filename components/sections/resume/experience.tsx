@@ -25,7 +25,7 @@ const Experiences: FC<{
                     value={{ color: "currentColor", size: "25" }}
                 >
                     <IconWrapper icon={icon} />
-                    <article className="text-primary2 h-full flex justify-center ml-4 uppercase flex-col">
+                    <article className="dark:text-primary2 text-secondary1 h-full flex justify-center ml-4 uppercase flex-col">
                         <SubHeading title={title} />
                     </article>
                 </IconContext.Provider>
