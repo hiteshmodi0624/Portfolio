@@ -1,5 +1,11 @@
 const projects:project[] = [
     {
+        title: "PitchedInn - A Social Media Platform for Startup & Business Enthusiasts ",
+        description:"Developing a social media platform for connecting entrepreneurs, investors, and collectors. Implemented features such as user authentication, user creation, posting, user follow, user edit, real-time messaging, and feed generation. Several features are currently running exclusively in development mode, and more features are being added.",
+        link: "https://github.com/hiteshmodi0624/PitchedInn",
+        hashtags:['next.js, react.js, vercel, tailwind-css, websockets, prisma, mongo-db, zod, trpc, type-script, next-auth']
+    },
+    {
         title: "Blog",
         description:"A Blogging Website developed using NextJs, TypeScript and TailwindCss. It includes features such as server side rendering, and reading data from a file.",
         link: "https://github.com/hiteshmodi0624/Blog",
