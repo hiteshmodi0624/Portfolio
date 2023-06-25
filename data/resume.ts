@@ -1,6 +1,15 @@
 const resumeData = {
     experiences: [
         {
+            company: "MindGinie",
+            position: "Product Consultant (Intern)",
+            time: "June 2023 onwards",
+            description: [`Research and propose new features to enhance the current product.`,`Explore and evaluate new APIs for integration.`,`Design architecture for implementing new features.`,
+`Finalize and implement fixes prior to app deployment.`,`Primarily utilizing React Native for front-end development.],`,
+            current:true,
+            location:"Remote"
+        },
+        {
             company: "Nathead",
             position: "Founder & Full Stack Developer",
             time: "2021 - Present",
