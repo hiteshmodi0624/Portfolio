@@ -21,9 +21,9 @@ const resumeData = {
         {
             company: "Chegg India",
             position: "Math Expert (Freelancer)",
-            time: "2021 - Present",
+            time: "2021 - 2023",
             description: [`Assisted students clarify their math doubts by solving the sums in the topics that include Calculus, Geometry, and Algebra.`],
-            current:true,
+            current:false,
             location:"Remote"
         },
     ],
