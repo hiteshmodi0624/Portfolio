@@ -10,14 +10,12 @@ const Hobbies=()=>{
             </h3>
             <div className="grid text-center grid-cols-[repeat(auto-fit,8rem)] justify-center items-start">
                 <IconWrapper icon={<FaChessKing />} title="Play Chess" />
-                <IconWrapper icon={< FaAppStore/>} title="Create websites and applications" />
                 <IconWrapper icon={<FaLaptopCode />} title="Code" />
                 <IconWrapper
                     icon={<BiMoviePlay />}
                     title="Watch Movies And TV Series"
                 />
                 <IconWrapper icon={<FaFootballBall />} title="Play Football" />
-                <IconWrapper icon={<BiCricketBall />} title="Watch Cricket" />
             </div>
         </div>
     );
