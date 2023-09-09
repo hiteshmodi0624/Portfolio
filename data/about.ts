@@ -13,9 +13,7 @@ const aboutData = {
     details: [
         { key:"Age", value:calculate_age(new Date(2001,6,24)) },
         { key:"Resides in", value:"Guwahati, India"},
-        { key:"Works at", value:"Nathead (Freelance)"},
         { key:"Email" , value:"mail@hiteshmodi.in" },
-        { key:"Open to Work", value:"Yes"},
     ],
     profiles:{
         leetcode:'https://leetcode.com/hiteshmodi0624/',
