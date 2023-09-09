@@ -13,7 +13,7 @@ const Hobbies=()=>{
                 <IconWrapper icon={<FaLaptopCode />} title="Code" />
                 <IconWrapper
                     icon={<BiMoviePlay />}
-                    title="Watch Movies And TV Series"
+                    title="Watch TV Series"
                 />
                 <IconWrapper icon={<FaFootballBall />} title="Play Football" />
             </div>
