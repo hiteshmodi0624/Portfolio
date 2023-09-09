@@ -1,21 +1,21 @@
 const resumeData = {
     experiences: [
         {
-            company: "MindGinie",
-            position: "Full Stack Developer (Intern)",
-            time: "June 2023 onwards",
-            description: [`Research and propose new features to enhance the current product.`,`Explore and evaluate new APIs for integration.`,`Design architecture for implementing new features.`,
-`Finalize and implement fixes prior to app deployment.`,`Primarily utilizing React Native for front-end development.`],
-            current:true,
+            company: "Nathead",
+            position: "Founder & Full Stack Developer",
+            time: "July 2021 - June 2023",
+            description: [`Developed and designed over 15 websites for clients using technologies such as HTML, CSS, Bootstrap, JavaScript, Node, Express, React, MongoDB and PHP.`,
+            `Acted as a point of contact for clients and managed their specific requirements.`],
+            current:false,
             location:"Remote"
         },
         {
-            company: "Nathead",
-            position: "Founder & Full Stack Developer",
-            time: "2021 - Present",
-            description: [`Developed and designed over 15 websites for clients using technologies such as HTML, CSS, Bootstrap, JavaScript, Node, Express, React, MongoDB and PHP.`,
-            `Acted as a point of contact for clients and managed their specific requirements.`],
-            current:true,
+            company: "MindGinie",
+            position: "Full Stack Developer (Intern)",
+            time: "June 2023 - August 2023",
+            description: [`Research and propose new features to enhance the current product.`,`Explore and evaluate new APIs for integration.`,`Design architecture for implementing new features.`,
+`Finalize and implement fixes prior to app deployment.`,`Primarily utilizing React Native for front-end development.`],
+            current:false,
             location:"Remote"
         },
         {
