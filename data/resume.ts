@@ -1,11 +1,22 @@
 const resumeData = {
     experiences: [
         {
+            company: "Umego",
+            position: "Full Stack Developer",
+            time: "December 2023 - Present",
+            description: [`Showcased versatility by quickly acquiring proficiency in emerging technologies such as NextJs, TypeScript, resulting in
+a 25% increase in team efficiency.`,`Achieved a 15% improvement in user satisfaction scores by crafting visually appealing and user-friendly interfaces
+using React.`,`Collaborated cross-functionally at Umego, contributing to reliable, scalable, and high-performance software. Utilized Jira,
+reducing task resolution time by 40% for timely project deliveries.`],
+            current:true,
+            location:"Remote"
+        },
+        {
             company: "MindGinie",
             position: "Full Stack Developer (Intern)",
             time: "June 2023 - August 2023",
-            description: [`Research and propose new features to enhance the current product.`,`Explore and evaluate new APIs for integration.`,`Design architecture for implementing new features.`,
-`Finalize and implement fixes prior to app deployment.`,`Primarily utilizing React Native for front-end development.`],
+            description: [`Researched on 5+ fitness app APIs for seamless integration with the product.`,`Crafted 3 engaging games leveraging React Native and CSS design.`,`Engineered a data retrieval system, which reduced run time by 90%.`,
+`Conducted comprehensive code reviews, leading to a 30% decrease in post-deployment issues and enhancing overall code quality.`],
             current:false,
             location:"Remote"
         },
@@ -13,8 +24,8 @@ const resumeData = {
             company: "Nathead",
             position: "Founder & Full Stack Developer",
             time: "July 2021 - June 2023",
-            description: [`Developed and designed over 15 websites for clients using technologies such as HTML, CSS, Bootstrap, JavaScript, Node, Express, React, MongoDB and PHP.`,
-            `Acted as a point of contact for clients and managed their specific requirements.`],
+            description: [`Designed and maintained 15+ websites using HTML, CSS and JavaScript.`,
+            `Mentored and guided 5 new team members in website development and technical discussions.`],
             current:false,
             location:"Remote"
         },
