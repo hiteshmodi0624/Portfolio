@@ -1,10 +1,10 @@
 const profileData={
     profilePicture : "/images/hitesh.png",
     subtitle : [
-        "Student At NIT Kurukshetra",
         "Software Developer",
-        "Competitive Programmer",
+        "Ambitious Learner",
         "Full Stack Developer",
+        "Freelancer",
     ],
     name:"Hitesh Modi",
     links:{
