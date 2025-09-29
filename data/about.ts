@@ -6,7 +6,9 @@ function calculate_age(dob:Date) {
 const aboutData = {
   title: "Hello I'm Hitesh Modi.",
   article: [
-    `A Software Developer with experience in both front-end and back-end development. I thrive on problem-solving and developing innovative solutions using the latest technologies. I have a strong foundation in React, React Native, Node.js, and AWS technologies, with a special interest in AI integrations and map-based applications. Feel free to reach out to me so that we can work on a project together!`,
+    `A passionate Software Engineer with 1.5 years of hands-on product engineering experience and a B.Tech from NIT Kurukshetra. I specialize in full-stack development, mobile applications, and AI-powered solutions.`,
+    `I've led full mobile migrations, built custom Mapbox integrations, prototyped agentic AI systems, and orchestrated end-to-end production systems on AWS. I thrive on owning end-to-end solutions from API design to app UX and production deployments.`,
+    `My expertise spans across mobility, geospatial applications, SaaS platforms, and AI tooling. I'm passionate about building clean, scalable architectures and delivering measurable impact through innovative technology solutions.`
   ],
   details: [
     { key: "Age", value: calculate_age(new Date(2001, 6, 24)) },

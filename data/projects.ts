@@ -1,5 +1,11 @@
 const projects:project[] = [
     {
+        title: "Calorie Tracker - Smart Nutrition Management",
+        description:"A comprehensive calorie tracking application with AI-powered food recognition, meal planning, and nutritional analysis. Features include barcode scanning, recipe suggestions, progress tracking, and integration with fitness wearables. Built with React Native for cross-platform compatibility and real-time data synchronization.",
+        link: "https://github.com/hiteshmodi0624/CaloriesTracker",
+        hashtags:['react-native', 'expo', 'ai', 'nutrition', 'llm', 'real-time-sync', 'cross-platform', 'prompt-engineering', 'ai']
+    },
+    {
         title: "PitchedInn - A Social Media Platform for Startup & Business Enthusiasts ",
         description:"Developing a social media platform for connecting entrepreneurs, investors, and collectors. Implemented features such as user authentication, user creation, posting, user follow, user edit, real-time messaging, and feed generation. Several features are currently running exclusively in development mode, and more features are being added.",
         link: "https://github.com/hiteshmodi0624/PitchedInn",

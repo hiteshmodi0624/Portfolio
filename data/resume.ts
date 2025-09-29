@@ -2,14 +2,15 @@ const resumeData = {
     experiences: [
         {
             company: "Digital Alpha Technologies",
-            position: "Software Developer",
+            position: "Software Engineer",
             time: "February 2024 - Present",
             description: [
-                "Spearheaded the migration of a navigation application from Flutter to React Native, delivering a production ready app in 3 months, resulting in a significant improvement in development efficiency.",
-                "Authored rnmapbox-ditch, a custom library that extends @rnmapbox, that enables Smart ETA Calculations, noseline computation, breadcrumb tracking and other advanced features, increasing app functionality by 25%.",
-                "Integrated AI-driven features using ChatGPT, leveraging prompt engineering to automate user interactions and enhance engagement by 25%.",
-                "Optimized CPU utilization and memory efficiency, reducing resource consumption by 50% while maintaining high performance across mobile and desktop platforms.",
-                "Mentored a junior developer, accelerating their on boarding and contributing to a 20% increase in team productivity."
+                "Led a full mobile migration: Flutter → React Native (Expo), re-architected the app, modularized features, and built a shared UI kit + navigation/state patterns.",
+                "Improved build times & release stability; introduced Smart ETA, Breadcrumb Tracking, and E2E testing with custom Mapbox integration layer for performance and offline readiness.",
+                "Built custom vector tile pipelines, map styles, offline packs, route rendering, heatmaps, and breadcrumbs/noseline tracking with smart ETA, snapping, and viewport logic.",
+                "Prototyped agentic AI & chatbots for real workflows - agents for route recommendations, name/domain suggestions, and data lookup with LLM tool integration and guardrails.",
+                "Built end-to-end tides & ocean model serving (prod-ready) with FastAPI, AWS orchestration (EC2, Lambda, Glue, EventBridge, S3), caching, tiling, and S3-based artifacts.",
+                "Created 'Ditch-in-a-Box' — full offline architecture on Raspberry Pi with local tile server + APIs, resilient boot scripts, monitoring, and graceful fallback modes."
             ],
             current: true,
             location: "Remote"
@@ -73,7 +74,7 @@ const resumeData = {
             company: "National Institute of Technology, Kurukshetra",
             position: "BTech",
             time: "2020 - 2024",
-            description: [`Current CGPA:8.21`, 'Member of Embedded-System and Robotics club.'],
+            description: [`B.Tech in Computer Science and Engineering`, 'CGPA: 8.21', 'Member of Embedded-System and Robotics club.'],
             current: false,
             location: "Kurukshetra"
         },

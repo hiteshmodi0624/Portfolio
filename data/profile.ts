@@ -1,10 +1,10 @@
 const profileData={
     profilePicture : "/images/hitesh.png",
     subtitle : [
-        "Software Developer",
-        "Ambitious Learner",
-        "Full Stack Developer",
-        "Freelancer",
+        "B.Tech from NIT Kurukshetra",
+        "Product Engineer (1.5 years)",
+        "Full-Stack Developer",
+        "Mobile & AI Developer",
     ],
     name:"Hitesh Modi",
     links:{
