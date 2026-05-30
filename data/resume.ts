@@ -1,105 +1,86 @@
-const resumeData = {
-    experiences: [
-        {
-            company: "Digital Alpha Technologies",
-            position: "Software Engineer",
-            time: "February 2024 - Present",
-            description: [
-                "Led a full mobile migration: Flutter → React Native (Expo), re-architected the app, modularized features, and built a shared UI kit + navigation/state patterns.",
-                "Improved build times & release stability; introduced Smart ETA, Breadcrumb Tracking, and E2E testing with custom Mapbox integration layer for performance and offline readiness.",
-                "Built custom vector tile pipelines, map styles, offline packs, route rendering, heatmaps, and breadcrumbs/noseline tracking with smart ETA, snapping, and viewport logic.",
-                "Prototyped agentic AI & chatbots for real workflows - agents for route recommendations, name/domain suggestions, and data lookup with LLM tool integration and guardrails.",
-                "Built end-to-end tides & ocean model serving (prod-ready) with FastAPI, AWS orchestration (EC2, Lambda, Glue, EventBridge, S3), caching, tiling, and S3-based artifacts.",
-                "Created 'Ditch-in-a-Box' — full offline architecture on Raspberry Pi with local tile server + APIs, resilient boot scripts, monitoring, and graceful fallback modes."
-            ],
-            current: true,
-            location: "Remote"
-        },
-        {
-            company: "XMB Technology",
-            position: "Full Stack Developer (Part Time)",
-            time: "January 2024 - August 2024",
-            description: [
-                "Applied SOLID principles and best practices in developing 10+ APIs and email templates using TypeScript and React.",
-                "Conducted comprehensive Jest testing across 50+ test cases, ensuring robustness and quality.",
-            ],
-            current: false,
-            location: "Remote"
-        },
-        {
-            company: "Umego",
-            position: "Full Stack Developer (Part Time)",
-            time: "September 2023 - December 2023",
-            description: [
-                `Achieved a 15% improvement in user engagement scores by creating visually appealing and user-friendly interfaces.`,
-                `Increased Admin panel efficiency by 20% with features like filtering while image uploading.`,
-                `Designed new interfaces and backend components using Next.js 13, Node.js, and TypeScript.`
-            ],
-            current: false,
-            location: "Remote"
-        },
-        {
-            company: "MindGinie",
-            position: "Full Stack Developer (Intern)",
-            time: "June 2023 - August 2023",
-            description: [
-                `Engineered 3 new engaging games utilising React Native and CSS design principles.`,
-                `Enhanced performance by caching, reducing initial data retrieval time by 90%.`
-            ],
-            current: false,
-            location: "Remote"
-        },
-        {
-            company: "Nathead",
-            position: "Founder & Full Stack Developer",
-            time: "July 2021 - June 2023",
-            description: [
-                `Created and maintained 15+ websites using HTML, CSS and JavaScript.`,
-                `Integrated SDLC with project managers for the gathering of requirements, leading to an increase in the customer satisfaction score by 20%.`
-            ],
-            current: false,
-            location: "Remote"
-        },
-        {
-            company: "Chegg India",
-            position: "Math Expert (Freelancer)",
-            time: "2021 - 2023",
-            description: [`Assisted students clarify their math doubts by solving the sums in the topics that include Calculus, Geometry, and Algebra.`],
-            current: false,
-            location: "Remote"
-        },
-    ],
-    education: [
-        {
-            company: "National Institute of Technology, Kurukshetra",
-            position: "BTech",
-            time: "2020 - 2024",
-            description: [`B.Tech in Computer Science and Engineering`, 'CGPA: 8.21', 'Member of Embedded-System and Robotics club.'],
-            current: false,
-            location: "Kurukshetra"
-        },
-        {
-            company: "Academind",
-            position: "Full Stack Developement course",
-            time: "2022-2023",
-            description: [
-                'React - The Complete Guide (incl Hooks, React Router, Redux)',
-                'NodeJS - The Complete Guide (MVC, REST APIs, GraphQL, Deno)',
-                'React Native - The Practical Guide [2023]',
-                'Next.js & React - The Complete Guide (incl. Two Paths!)',
-                'Understanding TypeScript'
-            ],
-            current: false,
-            location: "Online"
-        },
-        {
-            company: "Maria's Public School",
-            position: "Higher Secondary Education",
-            time: "2017-2019",
-            description: [],
-            current: false,
-            location: "Guwahati"
-        },
-    ],
+export interface Experience {
+  company: string;
+  position: string;
+  time: string;
+  location: string;
+  description: string[];
+  tags: string[];
+  current: boolean;
+}
+
+const resumeData: { experiences: Experience[] } = {
+  experiences: [
+    {
+      company: 'Extrack',
+      position: 'Founder & Software Engineer',
+      time: 'May 2026 – Present',
+      location: 'Remote',
+      current: true,
+      description: [
+        'Founded and built Extrack — a full-stack personal finance SaaS — from first commit to paying customers in under 15 days.',
+        'Architected the entire product: double-entry ledger, split expenses (Splitwise-style), lending allocations, recurring transactions, budgets, reports, and AI-powered transaction suggestions.',
+        'Built complete billing infrastructure: Razorpay subscriptions, 7-day autopay trial with mandate flow, lifecycle email programme (verify, trial reminders, card-expiry, renewal receipts).',
+        'Shipped free SEO tools (SIP/EMI calculators), 100-article help center, ops analytics dashboard, Meta pixel integration, and A/B experiment registry.',
+        'MCP server integration for AI-native transaction drafting; Playwright E2E test suite across all major flows; AWS CDK infra (Lambda, DynamoDB, Cognito, API GW).',
+      ],
+      tags: ['Next.js 14', 'AWS', 'DynamoDB', 'Razorpay', 'OpenAI', 'MCP', 'Playwright', 'Cognito', 'CDK'],
+    },
+    {
+      company: 'WhyCosmos',
+      position: 'Software Engineer',
+      time: 'Oct 2025 – Present',
+      location: 'Remote',
+      current: true,
+      description: [
+        'Built batch management system with Google Meet integration — automated meeting creation, live recording sync, and CloudFront signed URL delivery for course recordings.',
+        'Shipped school management features: bulk student upload with age validation, Cognito-backed welcome emails with credentials, access control, and enrollment checklists (WHY-246–249).',
+        'Implemented pricing & billing layer: GST calculations, annual pricing endpoint, course export/import, and centralized price validation across the platform.',
+        'Owned infrastructure: CloudWatch + SNS alarms for Lambda functions, RUM analytics dashboard, Lambda metrics monitoring, and CloudFront signed URL generation.',
+        'Built and maintained Playwright E2E test suite for admin and student flows; set up CI/CD workflows with GitHub Actions.',
+      ],
+      tags: ['TypeScript', 'AWS Lambda', 'DynamoDB', 'Cognito', 'Playwright', 'CloudFront', 'CloudWatch', 'React'],
+    },
+    {
+      company: 'Digital Alpha Technologies',
+      position: 'Software Engineer',
+      time: 'Feb 2024 – Oct 2025',
+      location: 'Remote',
+      current: false,
+      description: [
+        'Led Flutter → React Native (Expo) migration; shipped to production in 3 months across 3 internal apps.',
+        'Built AWS pipeline processing 1M+ API requests/day; cut latency from 1–2s to <60ms via layered caching and vectorized interpolation.',
+        'Created rnmapbox-ditch — custom Mapbox GL extension with Smart ETA, noseline computation, breadcrumb tracking, and offline packs.',
+        'Prototyped agentic AI workflows for route recommendations and domain suggestions using OpenAI tool calling.',
+        'Delivered "Ditch-in-a-Box" — full offline architecture on Raspberry Pi with local tile server, monitoring, and graceful fallbacks.',
+      ],
+      tags: ['React Native', 'Expo', 'AWS', 'Python', 'FastAPI', 'Mapbox GL', 'OpenAI'],
+    },
+    {
+      company: 'XMB Technology',
+      position: 'Full Stack Developer',
+      time: 'Jan 2024 – Aug 2024',
+      location: 'Remote',
+      current: false,
+      description: [
+        'Delivered 10+ TypeScript microservices with SOLID principles and Prisma ORM.',
+        'Built 30+ React email templates via Resend; automated 15+ hrs/week of client workflows.',
+        '90%+ test coverage across 50+ Jest unit tests.',
+      ],
+      tags: ['TypeScript', 'Node.js', 'React', 'Jest', 'Prisma', 'Resend'],
+    },
+    {
+      company: 'Umego',
+      position: 'Full Stack Developer',
+      time: 'Sep 2023 – Dec 2023',
+      location: 'Remote',
+      current: false,
+      description: [
+        'Improved user engagement 15% through UI redesign with Next.js 13.',
+        'Built Admin panel features reducing ops time 20%.',
+      ],
+      tags: ['Next.js 13', 'Node.js', 'TypeScript'],
+    },
+  ],
 };
-export default resumeData
+
+export default resumeData;

@@ -1,89 +1,46 @@
-const projects:project[] = [
-    {
-        title: "Calorie Tracker - Smart Nutrition Management",
-        description:"A comprehensive calorie tracking application with AI-powered food recognition, meal planning, and nutritional analysis. Features include barcode scanning, recipe suggestions, progress tracking, and integration with fitness wearables. Built with React Native for cross-platform compatibility and real-time data synchronization.",
-        link: "https://github.com/hiteshmodi0624/CaloriesTracker",
-        hashtags:['react-native', 'expo', 'ai', 'nutrition', 'llm', 'real-time-sync', 'cross-platform', 'prompt-engineering', 'ai']
-    },
-    {
-        title: "PitchedInn - A Social Media Platform for Startup & Business Enthusiasts ",
-        description:"Developing a social media platform for connecting entrepreneurs, investors, and collectors. Implemented features such as user authentication, user creation, posting, user follow, user edit, real-time messaging, and feed generation. Several features are currently running exclusively in development mode, and more features are being added.",
-        link: "https://github.com/hiteshmodi0624/PitchedInn",
-        hashtags:['next.js', 'react.js', 'vercel', 'tailwind-css', 'websockets', 'prisma', 'mongo-db', 'zod', 'trpc', 'type-script', 'next-auth']
-    },
-    {
-        title: "Blog",
-        description:"A Blogging Website developed using NextJs, TypeScript and TailwindCss. It includes features such as server side rendering, and reading data from a file.",
-        link: "https://github.com/hiteshmodi0624/Blog",
-        hashtags:['nextjs','reactjs','typescript','tailwindcss']
-    },
-    {
-        title: "Shop",
-        description:"An E-Commerce Website developed which includes features such as pagination, authentication, file-download, order-management and payemnt gateway integration",
-        link: "https://github.com/hiteshmodi0624/Shop",
-        hashtags:['node','express','mongoose','ejs']
-    },
-    {
-        title: "Expense Tracker App",
-        description:"An expense tracker app built for android and ios. It can be used to track recent as well as all time expenses. New Expense can be created and stored in a firebase server. Also the previously stored expenses can be edited or deleted.",
-        link: "https://github.com/hiteshmodi0624/ExpenseTracker",
-        hashtags:['react-native','firebase']
-    },
-    {
-        title: "Favourites Places",
-        description:"An favourites places app built for android and ios. It can be used to store the exact location of your favourite places along with a picture attached to the place.",
-        link: "https://github.com/hiteshmodi0624/Favourite-Places",
-        hashtags:['react-native','localstorage','authentication']
-    },
-    {
-        title: "Food Ordering Front-End Portal",
-        description:"A front-end website developed for ordering food and maintaining the cart.",
-        link: "https://github.com/hiteshmodi0624/Food-Ordering-System",
-        hashtags:['react','redux','front-end']
-    }
+export interface Project {
+  title: string;
+  description: string;
+  tags: string[];
+  github: string;
+  live?: string;
+  featured?: boolean;
+  featuredDetail?: string;
+}
+
+const projects: Project[] = [
+  {
+    title: 'Extrack — Personal Finance SaaS',
+    description:
+      'Full-stack personal finance SaaS I founded and built solo. Double-entry ledger, split expenses, lending allocations, recurring transactions, budgets, reports, AI-powered suggestions, Razorpay autopay subscriptions, MCP server integration, and Playwright E2E test suite.',
+    tags: ['Next.js 14', 'AWS Lambda', 'DynamoDB', 'Cognito', 'Razorpay', 'LLM', 'MCP', 'Playwright'],
+    github: 'https://github.com/hiteshmodi0624/Extrack',
+    live: 'https://myextrack.com',
+    featured: true,
+    featuredDetail: '4000+ commits · Paying customers · Live MCP integration',
+  },
+  {
+    title: 'CaloriesTracker — AI Nutrition Assistant',
+    description:
+      'AI-powered nutrition tracker with intent-driven GPT chat, meal planning, onboarding flow, and real-time nutrition analysis. Active development.',
+    tags: ['React Native', 'Expo', 'GPT-4', 'TypeScript'],
+    github: 'https://github.com/hiteshmodi0624/CaloriesTracker',
+  },
+  {
+    title: 'PitchedInn — Startup Social Platform',
+    description:
+      'Social platform for entrepreneurs and investors — feeds, posts, real-time messaging, and user authentication.',
+    tags: ['Next.js 13', 'TRPC', 'Prisma', 'MongoDB', 'TypeScript'],
+    github: 'https://github.com/hiteshmodi0624/PitchedInn',
+    live: 'https://pitched-inn.vercel.app',
+  },
+  {
+    title: 'ChatGPT Client',
+    description: 'Custom ChatGPT interface with conversation management, history, and a clean UI.',
+    tags: ['Next.js', 'TypeScript', 'Tailwind'],
+    github: 'https://github.com/hiteshmodi0624/chatgpt-client',
+    live: 'https://chatgpt-client-gamma.vercel.app',
+  },
 ];
-export default projects
 
-
-export const works:work[]=[
-    {
-        name: "Nathead",
-        image: "/images/works/nathead.webp",
-        link: "https://nathead.com/",
-        background:"dark"
-
-    },
-    {
-        name: "Aimers International",
-        image: "/images/works/aimers.png",
-        link: "https://aimersinternational.com/",
-        background: "light"
-    },
-    {
-        name: "Fidus Global",
-        image: "/images/works/fidus.png",
-        link: "https://fidusglobal.in/",
-        background: "dark"
-    },
-    {
-        name: "Adnil SchoolWorld Resource Centre",
-        image: "/images/works/school-world.png",
-        link: "https://www.schoolworldcentre.in/",
-        background: "dark"
-    },
-
-]
-
-export interface project{
-    title:string,
-    description:string,
-    link:string,
-    hashtags:string[]
-}
-
-export interface work{
-    name:string,
-    image:string,
-    link:string,
-    background:string
-}
+export default projects;
