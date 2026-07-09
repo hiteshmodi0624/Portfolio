@@ -52,7 +52,7 @@ jobs:
 
   deploy:
     needs: [build-test, gate]
-    if: needs.gate.outputs.deploy == 'true'
+    if: needs.gate.outputs.deploy == 'true' && needs.build-test.result == 'success'
     runs-on: ubuntu-latest
     permissions:
       id-token: write
