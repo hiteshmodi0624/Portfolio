@@ -32,3 +32,45 @@ html {
     scroll-behavior: auto;
   }
 }
+
+/* Beat 1 — breathing gradient wash (spec §3: "gradient breathes") */
+.hero-wash {
+  position: absolute;
+  inset: -10%;
+  background:
+    radial-gradient(60% 50% at 20% 20%, var(--color-wash-lavender) 0%, transparent 70%),
+    radial-gradient(50% 45% at 80% 25%, var(--color-wash-sky) 0%, transparent 70%),
+    radial-gradient(55% 55% at 55% 85%, var(--color-wash-blush) 0%, transparent 70%);
+  animation: hero-breathe 14s ease-in-out infinite alternate;
+}
+
+@keyframes hero-breathe {
+  from {
+    transform: scale(1) translateY(0);
+  }
+  to {
+    transform: scale(1.06) translateY(-1.5%);
+  }
+}
+
+/* Availability badge pulse */
+.badge-dot {
+  animation: badge-pulse 2.4s ease-in-out infinite;
+}
+
+@keyframes badge-pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.35;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-wash,
+  .badge-dot {
+    animation: none;
+  }
+}
