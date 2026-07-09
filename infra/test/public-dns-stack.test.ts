@@ -2,7 +2,7 @@ import * as fs from 'node:fs'
 import * as path from 'node:path'
 import { App } from 'aws-cdk-lib'
 import { Match, Template } from 'aws-cdk-lib/assertions'
-import { describe, it } from 'vitest'
+import { describe, expect, it } from 'vitest'
 import type { DnsRecord } from '../lib/dns-records'
 import { parseDnsRecords } from '../lib/dns-records'
 import { PublicDnsStack } from '../lib/public-dns-stack'
@@ -130,5 +130,56 @@ describe('PublicDnsStack — synthetic records (MX splitting)', () => {
       Type: 'MX',
       ResourceRecords: ['10 mail1.example.com', '20 mail2.example.com'],
     })
+  })
+})
+
+describe('PublicDnsStack — content-keyed construct ids (regression)', () => {
+  // Guards against the production incident: index-based ids (`CNAMERecord2`)
+  // renumber every subsequent record when an earlier entry is removed from
+  // dns-records.json. CloudFormation creates the renumbered record before
+  // deleting the old one, so the new logical id collides with an rrset the
+  // old logical id still owns -> "Tried to create resource record set ...
+  // but it already exists" -> failed UPDATE_ROLLBACK_FAILED. Ids must
+  // instead be derived from record content (type + name) so removing one
+  // record never renames the ids of the records around it.
+  function recordSetIdsByKey(template: Template): Map<string, string> {
+    const resources = template.findResources('AWS::Route53::RecordSet')
+    const byKey = new Map<string, string>()
+    for (const [logicalId, resource] of Object.entries(resources)) {
+      const key = `${resource.Properties?.Type as string}:${resource.Properties?.Name as string}`
+      byKey.set(key, logicalId)
+    }
+    return byKey
+  }
+
+  it('keeps identical logical ids for records unaffected by removing an earlier entry', () => {
+    const recordsPath = path.join(__dirname, '..', 'dns-records.json')
+    const allRecords = parseDnsRecords(JSON.parse(fs.readFileSync(recordsPath, 'utf-8')))
+    // Remove the FIRST entry — this is exactly the shape of the incident:
+    // every record after it used to get renumbered.
+    const withFirstRemoved = allRecords.slice(1)
+
+    const idsWithAll = recordSetIdsByKey(synth(allRecords))
+    const idsWithFirstRemoved = recordSetIdsByKey(synth(withFirstRemoved))
+
+    const sharedKeys = [...idsWithAll.keys()].filter((key) => idsWithFirstRemoved.has(key))
+    // Sanity check: the two templates must actually share some records,
+    // otherwise the assertion below would vacuously pass.
+    expect(sharedKeys.length).toBeGreaterThan(0)
+
+    for (const key of sharedKeys) {
+      expect(idsWithFirstRemoved.get(key)).toBe(idsWithAll.get(key))
+    }
+  })
+})
+
+describe('PublicDnsStack — duplicate type+name guard', () => {
+  it('throws a descriptive error when two records share the same type and name', () => {
+    const records = parseDnsRecords([
+      { name: 'www', type: 'CNAME', ttlSeconds: 300, values: ['a.example.com'] },
+      { name: 'www', type: 'CNAME', ttlSeconds: 300, values: ['b.example.com'] },
+    ])
+
+    expect(() => synth(records)).toThrow(/duplicate/i)
   })
 })
