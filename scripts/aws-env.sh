@@ -29,12 +29,26 @@ if [ -n "${AWS_PROFILE:-}" ]; then
   echo "aws-env: honoring pre-set AWS_PROFILE=$AWS_PROFILE"
 fi
 
-RESOLVED_ACCOUNT="$(aws sts get-caller-identity --query Account --output text 2>/dev/null)"
-if [ -z "$RESOLVED_ACCOUNT" ] || [ "$RESOLVED_ACCOUNT" = "None" ]; then
+# Guarded, not a bare `VAR="$(cmd)"`: under the `set -euo pipefail` this file
+# is sourced into (scripts/deploy-prod.sh), a bare assignment whose command
+# substitution fails would kill the *sourcing* shell right there — before
+# the friendly error below ever gets a chance to print. `if ! VAR="$(cmd)"`
+# puts the assignment in a tested context, so a failure is caught here
+# instead.
+if ! RESOLVED_ACCOUNT="$(aws sts get-caller-identity --query Account --output text 2>&1)"; then
   echo "=============================================================" >&2
   echo "aws-env: ERROR — could not resolve an AWS account." >&2
   echo "  'aws sts get-caller-identity' failed. Check your credentials" >&2
   echo "  (aws configure / AWS_PROFILE) and try again." >&2
+  echo "  Details: $RESOLVED_ACCOUNT" >&2
+  echo "=============================================================" >&2
+  return 1
+fi
+if [ -z "$RESOLVED_ACCOUNT" ] || [ "$RESOLVED_ACCOUNT" = "None" ]; then
+  echo "=============================================================" >&2
+  echo "aws-env: ERROR — could not resolve an AWS account." >&2
+  echo "  'aws sts get-caller-identity' returned no account. Check your" >&2
+  echo "  credentials (aws configure / AWS_PROFILE) and try again." >&2
   echo "=============================================================" >&2
   return 1
 fi
@@ -55,7 +69,14 @@ if [ "$RESOLVED_ACCOUNT" != "$ALLOWED_ACCOUNT" ]; then
   return 1
 fi
 
-RESOLVED_REGION="$(aws configure get region 2>/dev/null)"
+# Guarded for the same reason as the account resolution above: `aws
+# configure get region` exits non-zero when no region is configured at all
+# (a normal, expected case here — it just falls back to us-east-1 below), and
+# a bare assignment would otherwise kill the sourcing shell on that exit
+# before the fallback ever ran.
+if ! RESOLVED_REGION="$(aws configure get region 2>/dev/null)"; then
+  RESOLVED_REGION=""
+fi
 if [ -z "$RESOLVED_REGION" ]; then
   RESOLVED_REGION="us-east-1"
 fi

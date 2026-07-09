@@ -23,10 +23,14 @@ the result. `npm run verify` runs just the local gate on its own.
 
 **The script is idempotent and delegation-aware — safe to re-run any time.**
 Domain mode (the ACM cert + `hiteshmodi.in` alias records) activates on its
-own on a later run, once nameserver delegation is live and the static
-apex/`www` A records have been removed from `infra/dns-records.json`; until
-then it deploys `PortfolioSite` on its CloudFront domain only and tells you
-exactly what's still needed.
+own on a later run, once nameserver delegation is live and the static apex
+(`@`) A record has been removed from `infra/dns-records.json`; until then it
+deploys `PortfolioSite` on its CloudFront domain only and tells you exactly
+what's still needed. Only the apex record needs to go — `www` stays pointed
+at its current target (the script only checks the apex, since that's the
+only record CloudFront's alias would conflict with; there is no `www` alias
+in the stack, so removing the `www` A record would just orphan
+`www.hiteshmodi.in`).
 
 Only three things stay genuinely manual (nothing here can reach outside AWS
 or mint credentials on your behalf):
@@ -163,13 +167,15 @@ answers don't change, only who serves them.
 4. Wait for propagation. Verify mail flow (send/receive) and that the site is
    still reachable — at this point traffic is still Vercel-served, Route53 is
    just answering the same way Vercel's DNS did.
-5. **Cutover to CloudFront** (later, separate step): remove the `@` A and
-   `www` A entries from `dns-records.json` and run `deploy:dns`, then deploy
+5. **Cutover to CloudFront** (later, separate step): remove ONLY the apex
+   `@` A entry from `dns-records.json` and run `deploy:dns`, then deploy
    `PortfolioSite` with `-c domainName=hiteshmodi.in -c hostedZoneId=<id>`
    (creates the alias A/AAAA records + ACM cert against the same zone). A
    static `A` record and a CloudFront alias `A` record cannot coexist for the
-   same name — the JSON entries must be removed first, or the deploy will
-   conflict.
+   same name — the apex JSON entry must be removed first, or the deploy will
+   conflict. Leave the `www` A entry as-is: there is no `www` alias anywhere
+   in the stack, so it doesn't conflict with anything CDK manages, and
+   removing it would orphan `www.hiteshmodi.in` for no replacement.
 6. **Rollback:** re-add the removed Vercel `A` records to `dns-records.json`
    and run `deploy:dns`.
 

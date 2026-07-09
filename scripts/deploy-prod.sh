@@ -9,8 +9,13 @@
 # registrar (Hostinger) — that's outside AWS entirely.
 #
 # Usage:
-#   npm run deploy:prod                 # full run (verify + deploy)
-#   npm run deploy:prod -- --skip-verify # skip the local verify gate
+#   npm run deploy:prod                          # full run (verify + deploy)
+#   npm run deploy:prod -- --skip-verify         # skip the local verify gate
+#   npm run deploy:prod -- --force-domain-removal
+#       Allow deploying PortfolioSite WITHOUT the custom domain even when the
+#       stack is CURRENTLY deployed WITH it. Without this flag, that
+#       situation aborts loudly instead of silently deleting the live ACM
+#       cert + apex alias records (see the domain-downgrade guard below).
 set -euo pipefail
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
@@ -20,9 +25,11 @@ APEX_DOMAIN="hiteshmodi.in"
 AWS_REGION="us-east-1"
 
 SKIP_VERIFY=0
+FORCE_DOMAIN_REMOVAL=0
 for arg in "$@"; do
   case "$arg" in
     --skip-verify) SKIP_VERIFY=1 ;;
+    --force-domain-removal) FORCE_DOMAIN_REMOVAL=1 ;;
     *)
       echo "deploy-prod: unknown argument '$arg'" >&2
       exit 1
@@ -45,6 +52,41 @@ normalize_ns_list() {
   # lower-case, strip trailing dot, drop blanks, sort — for a stable diff
   # between two nameserver lists regardless of order/case/trailing dots.
   tr ',' '\n' | tr 'A-Z' 'a-z' | sed 's/\.$//' | sed '/^$/d' | sort
+}
+
+stack_has_domain_mode() {
+  # Detects whether the CURRENTLY deployed PortfolioSite stack already has
+  # domain mode active, by checking for the Route53 alias records that only
+  # exist when domainName/hostedZoneId were passed (see
+  # infra/lib/portfolio-site-stack.ts: `new route53.ARecord(this,
+  # 'ApexAlias', ...)` / `new route53.AaaaRecord(this, 'ApexAliasV6', ...)`).
+  # CDK suffixes construct ids with an 8-char hash (confirmed via `cdk
+  # synth`: logical ids are ApexAliasF68A3000 / ApexAliasV69046CB98), so the
+  # match here is a prefix check, not an exact id.
+  #
+  # Exit codes: 0 = domain mode IS active, 1 = it is NOT (including "stack
+  # doesn't exist yet", i.e. first-ever deploy — nothing to tear down).
+  # Any OTHER lookup failure (permissions, throttling, ...) aborts the whole
+  # script loudly rather than silently reading as "not active" — silently
+  # guessing wrong here is exactly the failure mode this check exists to
+  # prevent.
+  local raw
+  if ! raw="$(aws cloudformation list-stack-resources --region "$AWS_REGION" \
+    --stack-name PortfolioSite \
+    --query "StackResourceSummaries[].LogicalResourceId" --output text 2>&1)"; then
+    if printf '%s' "$raw" | grep -qi 'does not exist'; then
+      return 1
+    fi
+    echo "ERROR: could not check the currently deployed PortfolioSite stack" >&2
+    echo "for custom-domain resources ('aws cloudformation" >&2
+    echo "list-stack-resources' failed):" >&2
+    echo "$raw" >&2
+    echo "Refusing to guess — this check exists specifically to avoid" >&2
+    echo "silently deleting a live ACM cert + domain alias records." >&2
+    echo "Check AWS credentials/permissions and re-run." >&2
+    exit 1
+  fi
+  printf '%s' "$raw" | tr '\t' '\n' | grep -q '^ApexAlias'
 }
 
 health_check() {
@@ -161,6 +203,48 @@ else
   DOMAIN_MODE=1
   echo "DNS delegated and no conflicting static A records — deploying"
   echo "PortfolioSite WITH domainName=$APEX_DOMAIN (ACM cert + aliases)."
+fi
+
+# --- e (cont). domain-downgrade guard -------------------------------------
+# If this run computed DOMAIN_MODE=0 (e.g. a stale/failed dig answer read as
+# "not delegated") but PortfolioSite is CURRENTLY deployed WITH domain mode,
+# redeploying without -c domainName/-c hostedZoneId would delete the live
+# ACM cert + ApexAlias/ApexAliasV6 Route53 records (see
+# stack_has_domain_mode() above) — they carry no RemovalPolicy.RETAIN.
+# Abort loudly instead of silently downgrading; --force-domain-removal is
+# the explicit opt-out for a genuinely intended domain removal.
+if [ "$DOMAIN_MODE" -eq 0 ]; then
+  banner "Checking whether PortfolioSite is currently deployed WITH domain mode"
+  if stack_has_domain_mode; then
+    echo "  PortfolioSite IS currently deployed with domain mode active."
+    if [ "$FORCE_DOMAIN_REMOVAL" -eq 1 ]; then
+      echo "  --force-domain-removal passed — proceeding to deploy WITHOUT"
+      echo "  the custom domain anyway (this WILL delete the live ACM cert"
+      echo "  + apex alias records)."
+    else
+      echo "=============================================================" >&2
+      echo "deploy-prod: REFUSING TO CONTINUE — this run would redeploy" >&2
+      echo "PortfolioSite WITHOUT domain context, but the stack currently" >&2
+      echo "deployed already has the custom domain active (found a Route53" >&2
+      echo "alias resource whose logical id starts with 'ApexAlias')." >&2
+      echo "" >&2
+      echo "Those resources have no RemovalPolicy.RETAIN — proceeding would" >&2
+      echo "DELETE the live ACM cert and the apex alias records for" >&2
+      echo "$APEX_DOMAIN." >&2
+      echo "" >&2
+      echo "This delegation check says 'not delegated' (or a conflicting" >&2
+      echo "static A record was found) — that is usually a stale/transient" >&2
+      echo "answer, not an actual intent to remove the custom domain." >&2
+      echo "" >&2
+      echo "If you REALLY intend to remove the custom domain, re-run with:" >&2
+      echo "    npm run deploy:prod -- --force-domain-removal" >&2
+      echo "=============================================================" >&2
+      exit 1
+    fi
+  else
+    echo "  PortfolioSite is not currently deployed with domain mode active"
+    echo "  (or does not exist yet) — nothing to protect, proceeding."
+  fi
 fi
 
 # --- e (cont). deploy PortfolioSite ---------------------------------------
