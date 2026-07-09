@@ -3,6 +3,44 @@
 Stack: `PortfolioSite` (us-east-1). Private S3 + CloudFront (OAC). Static files
 come from `web/out` (Next.js `output: 'export'`).
 
+## One-command deploy
+
+From the repo root:
+
+```bash
+npm run deploy:prod
+```
+
+This is the whole production deploy: it resolves your AWS account/region and
+hard-guards against the wrong account, runs the full local verify gate (lint,
+typecheck, unit tests, build, E2E, `cdk synth` for both infra apps — pass
+`-- --skip-verify` to skip it on a re-run), deploys `PortfolioDns` (idempotent
+every run), auto-resolves every id/hostname it needs from CloudFormation
+outputs (nothing hand-copied), checks live DNS delegation against an external
+resolver and enables the custom domain automatically once it's safe to do so,
+syncs `web/out` to S3 in two passes, invalidates CloudFront, and health-checks
+the result. `npm run verify` runs just the local gate on its own.
+
+**The script is idempotent and delegation-aware — safe to re-run any time.**
+Domain mode (the ACM cert + `hiteshmodi.in` alias records) activates on its
+own on a later run, once nameserver delegation is live and the static
+apex/`www` A records have been removed from `infra/dns-records.json`; until
+then it deploys `PortfolioSite` on its CloudFront domain only and tells you
+exactly what's still needed.
+
+Only three things stay genuinely manual (nothing here can reach outside AWS
+or mint credentials on your behalf):
+
+1. **Hostinger nameserver delegation (one-time).** Pointing `hiteshmodi.in`
+   at the four `PortfolioDns` nameservers happens at the registrar — outside
+   AWS entirely. `npm run deploy:prod` prints them when delegation isn't live
+   yet.
+2. **First-time AWS credentials on a new machine** (`aws configure` or
+   `aws configure sso`) — establishing your own AWS identity is inherently a
+   one-time local action.
+3. **First-time `cdk bootstrap`** for account `901920055181` / `us-east-1` —
+   already done; only needed again for a new account/region.
+
 ## Prerequisites
 
 - Node 22, `npm ci` run at the repo root
