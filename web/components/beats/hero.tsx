@@ -39,6 +39,8 @@ export function Hero({ hero }: HeroProps) {
           <motion.span
             key={`${word}-${index}`}
             variants={reduce ? undefined : fadeRise}
+            initial={reduce ? false : undefined}
+            animate={reduce ? undefined : 'visible'}
             className={`inline-block ${word.startsWith('magic') ? 'text-violet' : ''}`}
           >
             {word}
