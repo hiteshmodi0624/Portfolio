@@ -1,6 +1,6 @@
 'use client'
 
-import { motion, useReducedMotion } from 'motion/react'
+import { motion } from 'motion/react'
 import type { FinaleContent } from '@/content/schema'
 import { fadeRise } from '@/lib/motion'
 import { SparkleField } from '@/components/ui/sparkle-field'
@@ -10,10 +10,12 @@ export interface FinaleProps {
 }
 
 /** Beat 8 — "Let's build your magic". The hero's sparkles return, denser,
- * gathering around the CTA. cal.com is a plain link in P1 (embed lands in P3). */
+ * gathering around the CTA. cal.com is a plain link in P1 (embed lands in P3).
+ * Reduced motion is handled by the page-level `MotionConfig` (see
+ * components/motion-provider): it degrades the transform to an instant snap
+ * while keeping the opacity fade — this component stays plain variant
+ * orchestration with no manual branching. */
 export function Finale({ finale }: FinaleProps) {
-  const reduce = useReducedMotion()
-
   return (
     <section
       id="finale"
@@ -23,8 +25,8 @@ export function Finale({ finale }: FinaleProps) {
       <SparkleField density={40} className="absolute inset-0 -z-10" />
 
       <motion.div
-        variants={reduce ? undefined : fadeRise}
-        initial={reduce ? false : 'hidden'}
+        variants={fadeRise}
+        initial="hidden"
         whileInView="visible"
         viewport={{ once: true, amount: 0.4 }}
         className="flex flex-col items-center"

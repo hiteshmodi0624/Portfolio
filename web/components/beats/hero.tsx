@@ -1,6 +1,6 @@
 'use client'
 
-import { motion, useReducedMotion } from 'motion/react'
+import { motion } from 'motion/react'
 import type { HeroContent } from '@/content/schema'
 import { fadeRise, staggerContainer } from '@/lib/motion'
 import { SparkleField } from '@/components/ui/sparkle-field'
@@ -10,10 +10,12 @@ export interface HeroProps {
 }
 
 /** Beat 1 — "A little magic for your business." Words materialize; gradient
- * breathes; sparkles drift and gently follow the cursor. Under reduced motion
- * everything renders statically: no transforms, no sparkles. */
+ * breathes; sparkles drift and gently follow the cursor. Reduced motion is
+ * handled by the page-level `MotionConfig` (see components/motion-provider):
+ * it degrades transforms to an instant snap while keeping the opacity fade,
+ * and SparkleField self-gates via its own matchMedia check — this component
+ * stays plain variant orchestration with no manual branching. */
 export function Hero({ hero }: HeroProps) {
-  const reduce = useReducedMotion()
   const words = hero.h1.split(' ')
 
   return (
@@ -30,17 +32,15 @@ export function Hero({ hero }: HeroProps) {
       </p>
 
       <motion.h1
-        variants={reduce ? undefined : staggerContainer}
-        initial={reduce ? false : 'hidden'}
+        variants={staggerContainer}
+        initial="hidden"
         animate="visible"
         className="mt-8 max-w-4xl font-display text-5xl font-semibold tracking-tight text-ink md:text-7xl"
       >
         {words.map((word, index) => (
           <motion.span
             key={`${word}-${index}`}
-            variants={reduce ? undefined : fadeRise}
-            initial={reduce ? false : undefined}
-            animate={reduce ? undefined : 'visible'}
+            variants={fadeRise}
             className={`inline-block ${word.startsWith('magic') ? 'text-violet' : ''}`}
           >
             {word}
