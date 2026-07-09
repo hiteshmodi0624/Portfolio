@@ -28,13 +28,14 @@ describe('PublicDnsStack — seeded records (dns-records.json)', () => {
     })
   })
 
-  it('creates an apex A record with both IPs and TTL 300', () => {
-    template.hasResourceProperties('AWS::Route53::RecordSet', {
-      Name: 'hiteshmodi.in.',
-      Type: 'A',
-      TTL: '300',
-      ResourceRecords: ['66.33.60.129', '76.76.21.164'],
-    })
+  it('omits the apex A record — the CloudFront alias owns the apex post-cutover', () => {
+    const recordSets = template.findResources('AWS::Route53::RecordSet')
+    const apexARecords = Object.values(recordSets).filter(
+      (r) => r.Properties?.Name === 'hiteshmodi.in.' && r.Properties?.Type === 'A',
+    )
+    if (apexARecords.length > 0) {
+      throw new Error('dns-records.json must not carry an apex A record after cutover')
+    }
   })
 
   it('creates a www CNAME to the apex', () => {

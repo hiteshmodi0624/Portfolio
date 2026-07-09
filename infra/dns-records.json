@@ -1,11 +1,5 @@
 [
   {
-    "name": "@",
-    "type": "A",
-    "ttlSeconds": 300,
-    "values": ["66.33.60.129", "76.76.21.164"]
-  },
-  {
     "name": "www",
     "type": "CNAME",
     "ttlSeconds": 3600,
