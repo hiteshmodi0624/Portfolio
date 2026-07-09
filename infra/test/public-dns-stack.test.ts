@@ -38,13 +38,14 @@ describe('PublicDnsStack — seeded records (dns-records.json)', () => {
     }
   })
 
-  it('creates a www CNAME to the apex', () => {
-    template.hasResourceProperties('AWS::Route53::RecordSet', {
-      Name: 'www.hiteshmodi.in.',
-      Type: 'CNAME',
-      TTL: '3600',
-      ResourceRecords: ['hiteshmodi.in'],
-    })
+  it('omits any www record — the CloudFront alias owns www post-cutover', () => {
+    const recordSets = template.findResources('AWS::Route53::RecordSet')
+    const wwwRecords = Object.values(recordSets).filter(
+      (r) => r.Properties?.Name === 'www.hiteshmodi.in.',
+    )
+    if (wwwRecords.length > 0) {
+      throw new Error('dns-records.json must not carry a www record after cutover')
+    }
   })
 
   it('creates ftp A, blog CNAME, and wildcard CNAME records', () => {
@@ -83,11 +84,24 @@ describe('PublicDnsStack — seeded records (dns-records.json)', () => {
     })
   })
 
-  it('creates the verification TXT record', () => {
+  it('creates the verification + SPF TXT record', () => {
     template.hasResourceProperties('AWS::Route53::RecordSet', {
       Name: 'hiteshmodi.in.',
       Type: 'TXT',
       TTL: '3600',
+      ResourceRecords: Match.arrayWith([
+        '"google-site-verification=T5Af1FA2o07_ixPaI7V6OukoUJ7pJ-4dlGOjXckTsMs"',
+        '"v=spf1 include:_spf.google.com ~all"',
+      ]),
+    })
+  })
+
+  it('creates a DMARC TXT record at p=none (monitoring-first)', () => {
+    template.hasResourceProperties('AWS::Route53::RecordSet', {
+      Name: '_dmarc.hiteshmodi.in.',
+      Type: 'TXT',
+      TTL: '3600',
+      ResourceRecords: ['"v=DMARC1; p=none; rua=mailto:mail@hiteshmodi.in"'],
     })
   })
 

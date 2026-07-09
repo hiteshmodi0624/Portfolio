@@ -160,17 +160,16 @@ if [ -n "$PUBLIC_NS_SORTED" ] && [ "$PUBLIC_NS_SORTED" = "$ZONE_NS_SORTED" ]; th
   DELEGATED=1
 fi
 
-# Only the apex ("@") structurally conflicts with what PortfolioSiteStack
-# creates: ApexAlias/ApexAliasV6 target the bare zone name only, and
-# distribution.domainNames is just [domainName] (the apex) — there is no
-# "www" alias anywhere in the stack. A static "www" A record does not
-# conflict with anything CDK manages here, so it is intentionally excluded
-# from this check (removing it would orphan www.hiteshmodi.in for no
-# corresponding replacement).
-HAS_STATIC_APEX_A="$(node -e '
+# Both the apex ("@") and "www" now structurally conflict with what
+# PortfolioSiteStack creates: ApexAlias/ApexAliasV6 target the bare zone name,
+# WwwAlias/WwwAliasV6 target "www.<domain>", and distribution.domainNames is
+# [domainName, "www.<domain>"]. A static record of ANY type at either name
+# (e.g. the old "www" CNAME) would conflict with the stack-owned alias
+# records, so both are checked here.
+HAS_STATIC_DOMAIN_RECORDS="$(node -e '
   const fs = require("fs");
   const recs = JSON.parse(fs.readFileSync("infra/dns-records.json", "utf8"));
-  const bad = recs.some((r) => r.type === "A" && r.name === "@");
+  const bad = recs.some((r) => (r.type === "A" && r.name === "@") || r.name === "www");
   console.log(bad ? "yes" : "no");
 ')"
 
@@ -187,21 +186,21 @@ if [ "$DELEGATED" -eq 0 ]; then
   echo ""
   echo "Then re-run: npm run deploy:prod"
   echo "------------------------------------------------------------"
-elif [ "$HAS_STATIC_APEX_A" = "yes" ]; then
+elif [ "$HAS_STATIC_DOMAIN_RECORDS" = "yes" ]; then
   DOMAIN_MODE=0
   echo "------------------------------------------------------------"
   echo "DNS is delegated, but infra/dns-records.json still has a static"
-  echo "apex '@' A record. A static A record and the CloudFront alias"
-  echo "A record cannot coexist for the same name."
+  echo "apex '@' A record or a 'www' entry. Those conflict with the"
+  echo "CloudFront alias records the stack owns for the same names."
   echo ""
   echo "Deploying PortfolioSite WITHOUT the custom domain for now."
-  echo "Remove the '@' A entry from infra/dns-records.json"
-  echo "(a git-tracked edit — this script will not touch the file),"
-  echo "then re-run: npm run deploy:prod"
+  echo "Remove the apex '@' A entry and any 'www' entries from"
+  echo "infra/dns-records.json (a git-tracked edit — this script will not"
+  echo "touch the file), then re-run: npm run deploy:prod"
   echo "------------------------------------------------------------"
 else
   DOMAIN_MODE=1
-  echo "DNS delegated and no conflicting static A records — deploying"
+  echo "DNS delegated and no conflicting static apex/www records — deploying"
   echo "PortfolioSite WITH domainName=$APEX_DOMAIN (ACM cert + aliases)."
 fi
 
@@ -315,8 +314,8 @@ echo ""
 echo "Remaining manual step(s):"
 if [ "$DELEGATED" -eq 0 ]; then
   echo "  - Switch $APEX_DOMAIN's nameservers at Hostinger to the PortfolioDns nameservers above, then re-run npm run deploy:prod."
-elif [ "$HAS_STATIC_APEX_A" = "yes" ]; then
-  echo "  - Remove the '@' A record from infra/dns-records.json, then re-run npm run deploy:prod."
+elif [ "$HAS_STATIC_DOMAIN_RECORDS" = "yes" ]; then
+  echo "  - Remove the '@' A record and any 'www' entries from infra/dns-records.json, then re-run npm run deploy:prod."
 else
   echo "  - None — domain mode is fully active."
 fi

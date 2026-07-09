@@ -86,25 +86,43 @@ describe('PortfolioSiteStack — default (no custom domain)', () => {
 describe('PortfolioSiteStack — with domain context', () => {
   const template = synth({ domainName: 'hiteshmodi.in', hostedZoneId: 'Z00000000000000000000' })
 
-  it('creates a DNS-validated ACM certificate for the domain', () => {
+  it('creates a DNS-validated ACM certificate for the domain with a www SAN', () => {
     template.hasResourceProperties('AWS::CertificateManager::Certificate', {
       DomainName: 'hiteshmodi.in',
       ValidationMethod: 'DNS',
+      SubjectAlternativeNames: ['www.hiteshmodi.in'],
     })
   })
 
-  it('aliases apex A and AAAA records to the distribution', () => {
-    template.resourceCountIs('AWS::Route53::RecordSet', 2)
+  it('aliases apex and www A and AAAA records to the distribution', () => {
+    template.resourceCountIs('AWS::Route53::RecordSet', 4)
     template.hasResourceProperties('AWS::Route53::RecordSet', {
       Name: 'hiteshmodi.in.',
       Type: 'A',
       AliasTarget: Match.objectLike({ DNSName: Match.anyValue() }),
     })
+    template.hasResourceProperties('AWS::Route53::RecordSet', {
+      Name: 'hiteshmodi.in.',
+      Type: 'AAAA',
+      AliasTarget: Match.objectLike({ DNSName: Match.anyValue() }),
+    })
+    template.hasResourceProperties('AWS::Route53::RecordSet', {
+      Name: 'www.hiteshmodi.in.',
+      Type: 'A',
+      AliasTarget: Match.objectLike({ DNSName: Match.anyValue() }),
+    })
+    template.hasResourceProperties('AWS::Route53::RecordSet', {
+      Name: 'www.hiteshmodi.in.',
+      Type: 'AAAA',
+      AliasTarget: Match.objectLike({ DNSName: Match.anyValue() }),
+    })
   })
 
-  it('attaches the alias domain to the distribution', () => {
+  it('attaches both the apex and www alias domains to the distribution', () => {
     template.hasResourceProperties('AWS::CloudFront::Distribution', {
-      DistributionConfig: Match.objectLike({ Aliases: ['hiteshmodi.in'] }),
+      DistributionConfig: Match.objectLike({
+        Aliases: Match.arrayWith(['hiteshmodi.in', 'www.hiteshmodi.in']),
+      }),
     })
   })
 })

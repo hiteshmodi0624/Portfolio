@@ -71,6 +71,7 @@ export class PortfolioSiteStack extends cdk.Stack {
       // Stack is pinned to us-east-1 (bin/), which CloudFront certs require.
       certificate = new acm.Certificate(this, 'SiteCertificate', {
         domainName,
+        subjectAlternativeNames: [`www.${domainName}`],
         validation: acm.CertificateValidation.fromDns(hostedZone),
       })
     }
@@ -113,13 +114,25 @@ export class PortfolioSiteStack extends cdk.Stack {
           ttl: cdk.Duration.seconds(300),
         },
       ],
-      ...(domainName && certificate ? { domainNames: [domainName], certificate } : {}),
+      ...(domainName && certificate
+        ? { domainNames: [domainName, `www.${domainName}`], certificate }
+        : {}),
     })
 
     if (domainName && hostedZone) {
       const target = route53.RecordTarget.fromAlias(new targets.CloudFrontTarget(distribution))
       new route53.ARecord(this, 'ApexAlias', { zone: hostedZone, target })
       new route53.AaaaRecord(this, 'ApexAliasV6', { zone: hostedZone, target })
+      new route53.ARecord(this, 'WwwAlias', {
+        zone: hostedZone,
+        recordName: `www.${domainName}`,
+        target,
+      })
+      new route53.AaaaRecord(this, 'WwwAliasV6', {
+        zone: hostedZone,
+        recordName: `www.${domainName}`,
+        target,
+      })
     }
 
     new cdk.CfnOutput(this, 'BucketName', { value: siteBucket.bucketName })

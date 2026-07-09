@@ -1,11 +1,5 @@
 [
   {
-    "name": "www",
-    "type": "CNAME",
-    "ttlSeconds": 3600,
-    "values": ["hiteshmodi.in"]
-  },
-  {
     "name": "ftp",
     "type": "A",
     "ttlSeconds": 1800,
@@ -39,6 +33,15 @@
     "name": "@",
     "type": "TXT",
     "ttlSeconds": 3600,
-    "values": ["google-site-verification=T5Af1FA2o07_ixPaI7V6OukoUJ7pJ-4dlGOjXckTsMs"]
+    "values": [
+      "google-site-verification=T5Af1FA2o07_ixPaI7V6OukoUJ7pJ-4dlGOjXckTsMs",
+      "v=spf1 include:_spf.google.com ~all"
+    ]
+  },
+  {
+    "name": "_dmarc",
+    "type": "TXT",
+    "ttlSeconds": 3600,
+    "values": ["v=DMARC1; p=none; rua=mailto:mail@hiteshmodi.in"]
   }
 ]

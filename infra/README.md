@@ -22,15 +22,16 @@ syncs `web/out` to S3 in two passes, invalidates CloudFront, and health-checks
 the result. `npm run verify` runs just the local gate on its own.
 
 **The script is idempotent and delegation-aware — safe to re-run any time.**
-Domain mode (the ACM cert + `hiteshmodi.in` alias records) activates on its
-own on a later run, once nameserver delegation is live and the static apex
-(`@`) A record has been removed from `infra/dns-records.json`; until then it
-deploys `PortfolioSite` on its CloudFront domain only and tells you exactly
-what's still needed. Only the apex record needs to go — `www` stays pointed
-at its current target (the script only checks the apex, since that's the
-only record CloudFront's alias would conflict with; there is no `www` alias
-in the stack, so removing the `www` A record would just orphan
-`www.hiteshmodi.in`).
+Domain mode (the ACM cert + `hiteshmodi.in` + `www.hiteshmodi.in` alias
+records) activates on its own on a later run, once nameserver delegation is
+live and the static apex (`@`) A record and any `www` entry have been removed
+from `infra/dns-records.json`; until then it deploys `PortfolioSite` on its
+CloudFront domain only and tells you exactly what's still needed. Both the
+apex and `www` are stack-owned in domain mode — the ACM cert carries
+`www.hiteshmodi.in` as a SAN and the distribution aliases both names, so a
+static record at either name would conflict with the stack-owned alias
+records. `www` no longer breaks TLS: it now gets its own certificate SAN and
+CloudFront alias instead of relying on a bare CNAME to the apex.
 
 Only three things stay genuinely manual (nothing here can reach outside AWS
 or mint credentials on your behalf):
@@ -167,20 +168,22 @@ answers don't change, only who serves them.
 4. Wait for propagation. Verify mail flow (send/receive) and that the site is
    still reachable — at this point traffic is still Vercel-served, Route53 is
    just answering the same way Vercel's DNS did.
-5. **Cutover to CloudFront** (later, separate step): remove ONLY the apex
-   `@` A entry from `dns-records.json` and run `deploy:dns`, then deploy
-   `PortfolioSite` with `-c domainName=hiteshmodi.in -c hostedZoneId=<id>`
-   (creates the alias A/AAAA records + ACM cert against the same zone). A
-   static `A` record and a CloudFront alias `A` record cannot coexist for the
-   same name — the apex JSON entry must be removed first, or the deploy will
-   conflict. Leave the `www` A entry as-is: there is no `www` alias anywhere
-   in the stack, so it doesn't conflict with anything CDK manages, and
-   removing it would orphan `www.hiteshmodi.in` for no replacement.
-6. **Rollback:** re-add the removed Vercel `A` records to `dns-records.json`
-   and run `deploy:dns`.
+5. **Cutover to CloudFront** (later, separate step): remove the apex `@` A
+   entry AND the `www` entry from `dns-records.json` and run `deploy:dns`,
+   then deploy `PortfolioSite` with
+   `-c domainName=hiteshmodi.in -c hostedZoneId=<id>` (creates the apex +
+   `www` alias A/AAAA records and an ACM cert with `www.hiteshmodi.in` as a
+   SAN, against the same zone). A static record and a CloudFront alias record
+   cannot coexist for the same name — both the apex and `www` JSON entries
+   must be removed first, or the deploy will conflict. Apex + `www` are both
+   stack-owned in domain mode; `www` no longer breaks TLS since it now gets
+   its own cert SAN and CloudFront alias instead of a bare CNAME to the apex.
+6. **Rollback:** re-add the removed Vercel `A`/`CNAME` records to
+   `dns-records.json` and run `deploy:dns`.
 
-**Known gap:** no SPF or DMARC TXT records exist in the current DNS today —
-this is inherited from the existing setup, not introduced by this migration.
-Adding `"v=spf1 include:_spf.google.com ~all"` and a DMARC policy is a
-worthwhile follow-up, but a deliberate decision (DMARC policy strictness
-affects mail deliverability) rather than something to auto-add here.
+SPF (`"v=spf1 include:_spf.google.com ~all"`) and DMARC
+(`"v=DMARC1; p=none; rua=mailto:mail@hiteshmodi.in"`) TXT records are now
+seeded in `dns-records.json`. DMARC starts at `p=none` deliberately — a
+monitoring-first policy, since `quarantine`/`reject` affect mail
+deliverability and should only follow once DMARC reports show clean
+alignment.
