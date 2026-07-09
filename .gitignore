@@ -31,3 +31,5 @@ npm-debug.log*
 # tooling
 .superpowers/
 .serena/
+infra/cdk-outputs.json
+infra/dns-outputs.json

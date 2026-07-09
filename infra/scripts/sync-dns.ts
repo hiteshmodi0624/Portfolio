@@ -461,39 +461,84 @@ function applyPlan(zoneId: string, plan: Plan): void {
   console.log(`Applied. ChangeInfo: Id=${parsed.ChangeInfo?.Id} Status=${parsed.ChangeInfo?.Status}`)
 }
 
-function parseArgs(argv: string[]): { apply: boolean; zoneId: string | undefined } {
+// Post-incident guard: a bad dns-records.json edit must not silently delete
+// mail-critical or large swaths of records (deploy-prod runs --apply
+// unconditionally). MX deletes and large delete plans need --force-deletes.
+const MAX_UNFORCED_DELETES = 3
+
+export function assessPlanSafety(plan: Plan): { safe: true } | { safe: false; reason: string } {
+  const mxDeletes = plan.deletes.filter((d) => d.type === 'MX')
+  if (mxDeletes.length > 0) {
+    return {
+      safe: false,
+      reason:
+        `plan deletes ${mxDeletes.length} MX record set(s) — mail-critical. ` +
+        'If intentional, re-run with --force-deletes.',
+    }
+  }
+  if (plan.deletes.length > MAX_UNFORCED_DELETES) {
+    return {
+      safe: false,
+      reason:
+        `plan contains ${plan.deletes.length} deletes (max ${MAX_UNFORCED_DELETES} without ` +
+        '--force-deletes). Review the plan above; if intentional, re-run with --force-deletes.',
+    }
+  }
+  return { safe: true }
+}
+
+function parseArgs(argv: string[]): {
+  apply: boolean
+  forceDeletes: boolean
+  zoneId: string | undefined
+} {
   let apply = false
+  let forceDeletes = false
   let zoneId: string | undefined
 
   for (let i = 0; i < argv.length; i += 1) {
     const arg = argv[i]
     if (arg === '--apply') {
       apply = true
+    } else if (arg === '--force-deletes') {
+      forceDeletes = true
     } else if (arg === '--zone-id') {
       zoneId = argv[i + 1]
       i += 1
+    } else {
+      // A typoed flag must never degrade a intended --apply into a silent
+      // dry-run (or vice versa) — fail loudly instead.
+      console.error(`sync-dns: unknown argument "${arg}" (expected --apply, --force-deletes, --zone-id <id>)`)
+      process.exit(2)
     }
   }
 
-  return { apply, zoneId }
+  return { apply, forceDeletes, zoneId }
 }
 
 function main(): void {
-  const { apply, zoneId: explicitZoneId } = parseArgs(process.argv.slice(2))
+  const { apply, forceDeletes, zoneId: explicitZoneId } = parseArgs(process.argv.slice(2))
   const zoneId = resolveZoneId(explicitZoneId)
 
   const desired = loadDnsRecords(path.join(__dirname, '..', 'dns-records.json'))
   const live = fetchAllLiveRecords(awsExec, zoneId)
   const plan = computePlan(desired, live)
 
-  if (apply) {
-    applyPlan(zoneId, plan)
-  } else {
-    printPlan(plan)
-    if (plan.upserts.length === 0 && plan.deletes.length === 0) {
-      process.exit(0)
-    }
+  // Apply mode shows exactly what it is about to do — the applied plan must
+  // never be invisible in deploy logs.
+  printPlan(plan)
+
+  if (!apply) {
+    return
   }
+
+  const verdict = assessPlanSafety(plan)
+  if (!verdict.safe && !forceDeletes) {
+    console.error(`sync-dns: REFUSING to apply — ${verdict.reason}`)
+    process.exit(1)
+  }
+
+  applyPlan(zoneId, plan)
 }
 
 if (require.main === module) {

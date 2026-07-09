@@ -1,6 +1,12 @@
 import { describe, expect, it } from 'vitest'
 import type { DnsRecord } from '../lib/dns-records'
-import { computePlan, fetchAllLiveRecords, toApiValue, type LiveRecord } from '../scripts/sync-dns'
+import {
+  assessPlanSafety,
+  computePlan,
+  fetchAllLiveRecords,
+  toApiValue,
+  type LiveRecord,
+} from '../scripts/sync-dns'
 
 describe('computePlan', () => {
   it('1. UPSERTs a desired record that is entirely missing from live', () => {
@@ -433,5 +439,46 @@ describe('fetchAllLiveRecords', () => {
     expect(calls[1]).toEqual(
       expect.arrayContaining(['--start-record-name', 'b.hiteshmodi.in.', '--start-record-type', 'A']),
     )
+  })
+})
+
+describe('assessPlanSafety — delete guard (post-incident)', () => {
+  const entry = (type: string, name = 'x.hiteshmodi.in.') => ({
+    name,
+    type,
+    reason: 'test entry',
+    ttlSeconds: 300,
+    values: ['v'],
+  })
+
+  it('flags any MX delete as unsafe (mail-critical)', () => {
+    const verdict = assessPlanSafety({
+      upserts: [],
+      deletes: [entry('MX', 'hiteshmodi.in.')],
+      protectedSkips: [],
+    })
+    expect(verdict.safe).toBe(false)
+    if (!verdict.safe) expect(verdict.reason).toMatch(/MX/)
+  })
+
+  it('flags more than 3 deletes as unsafe', () => {
+    const verdict = assessPlanSafety({
+      upserts: [],
+      deletes: [entry('A'), entry('CNAME'), entry('TXT'), entry('A', 'y.hiteshmodi.in.')],
+      protectedSkips: [],
+    })
+    expect(verdict.safe).toBe(false)
+    if (!verdict.safe) expect(verdict.reason).toMatch(/4 delete/)
+  })
+
+  it('allows a small non-MX delete plan', () => {
+    expect(
+      assessPlanSafety({ upserts: [entry('A')], deletes: [entry('CNAME')], protectedSkips: [] })
+        .safe,
+    ).toBe(true)
+  })
+
+  it('allows an empty plan', () => {
+    expect(assessPlanSafety({ upserts: [], deletes: [], protectedSkips: [] }).safe).toBe(true)
   })
 })
