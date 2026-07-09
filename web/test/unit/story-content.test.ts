@@ -114,6 +114,20 @@ describe('shipped story content', () => {
     expect(story.storefront.punchline).toBe('Your website should be your best salesperson.')
   })
 
+  it('pins dialogue copy with byte-exact typographic quotes', () => {
+    // WhatsApp message — chaos card with curly quotes (left and right double quotation marks)
+    const whatsappCard = story.chaos.cards.find((card) => card.id === 'whatsapp')
+    expect(whatsappCard?.body).toBe('“Hi! Do you have anything free this Saturday?”')
+
+    // Customer dialogue — turn event with curly quotes (left and right double quotation marks)
+    const customerMessage = story.turn.events.find((event) => event.id === 'customer-message')
+    expect(customerMessage?.text).toBe('“Hey — do you have anything free this Saturday?”')
+
+    // Helper dialogue reply — turn event with curly quotes (left and right double quotation marks)
+    const helperReply = story.turn.events.find((event) => event.id === 'helper-reply')
+    expect(helperReply?.text).toBe('“We do — 10:30 on Saturday just opened up. Want me to book you in?”')
+  })
+
   it('ships the eight proof projects with the verified live urls', () => {
     expect(proof.heading).toBe('Built before. Shipped before.')
     expect(proof.projects.map((project) => project.name)).toEqual([

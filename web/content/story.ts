@@ -10,7 +10,7 @@ export const story: StoryContent = StorySchema.parse({
         kind: 'message',
         hue: 'amber',
         title: 'WhatsApp · 11:47 PM',
-        body: '"Hi! Do you have anything free this Saturday?"',
+        body: '“Hi! Do you have anything free this Saturday?”',
         meta: 'Still unanswered',
       },
       {
@@ -63,14 +63,14 @@ export const story: StoryContent = StorySchema.parse({
         id: 'customer-message',
         kind: 'customer',
         wash: 'sky',
-        text: '"Hey — do you have anything free this Saturday?"',
+        text: '“Hey — do you have anything free this Saturday?”',
         meta: '2:14 AM',
       },
       {
         id: 'helper-reply',
         kind: 'helper',
         wash: 'lavender',
-        text: '"We do — 10:30 on Saturday just opened up. Want me to book you in?"',
+        text: '“We do — 10:30 on Saturday just opened up. Want me to book you in?”',
         meta: 'Answered in 4 seconds',
       },
       {
