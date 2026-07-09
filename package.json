@@ -1,0 +1,19 @@
+{
+  "name": "portfolio",
+  "version": "1.0.0",
+  "private": true,
+  "engines": {
+    "node": ">=22"
+  },
+  "workspaces": [
+    "web",
+    "infra"
+  ],
+  "scripts": {
+    "lint": "npm run lint -w web",
+    "typecheck": "npm run typecheck -w web && npm run typecheck -w infra",
+    "test:unit": "npm run test:unit -w web && npm run test -w infra",
+    "build": "npm run build -w web",
+    "test:e2e": "npm run test:e2e -w web"
+  }
+}
