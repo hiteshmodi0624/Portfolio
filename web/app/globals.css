@@ -1,1 +1,34 @@
 @import "tailwindcss";
+
+@theme {
+  /* Palette — spec §2, light-only. Violet is decorative/large-text only on white. */
+  --color-base: #FDFCFB;
+  --color-wash-lavender: #F5F3FF;
+  --color-wash-sky: #EEF7FF;
+  --color-wash-blush: #FDF2F8;
+  --color-ink: #1E1B2E;
+  --color-muted: #5B5773;
+  --color-violet: #7C5CFF;
+  --color-sky: #4DABF7;
+  --color-blush: #F783AC;
+  /* Chaos hues — used by Beat 2 (P2); the "handled" scene resolves them to pastels. */
+  --color-chaos-amber: #FFA94D;
+  --color-chaos-red: #FF6B6B;
+}
+
+@theme inline {
+  /* Variables injected on <html> by next/font in app/layout.tsx */
+  --font-sans: var(--font-inter);
+  --font-display: var(--font-bricolage);
+  --font-mono: var(--font-jetbrains);
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}
