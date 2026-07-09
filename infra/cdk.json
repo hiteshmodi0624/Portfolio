@@ -1,0 +1,8 @@
+{
+  "app": "npx tsx bin/portfolio-site.ts",
+  "watch": {
+    "include": ["**"],
+    "exclude": ["node_modules", "cdk.out"]
+  },
+  "context": {}
+}

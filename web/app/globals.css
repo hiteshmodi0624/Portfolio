@@ -1,0 +1,76 @@
+@import "tailwindcss";
+
+@theme {
+  /* Palette — spec §2, light-only. Violet is decorative/large-text only on white. */
+  --color-base: #FDFCFB;
+  --color-wash-lavender: #F5F3FF;
+  --color-wash-sky: #EEF7FF;
+  --color-wash-blush: #FDF2F8;
+  --color-ink: #1E1B2E;
+  --color-muted: #5B5773;
+  --color-violet: #7C5CFF;
+  --color-sky: #4DABF7;
+  --color-blush: #F783AC;
+  /* Chaos hues — used by Beat 2 (P2); the "handled" scene resolves them to pastels. */
+  --color-chaos-amber: #FFA94D;
+  --color-chaos-red: #FF6B6B;
+}
+
+@theme inline {
+  /* Variables injected on <html> by next/font in app/layout.tsx */
+  --font-sans: var(--font-inter);
+  --font-display: var(--font-bricolage);
+  --font-mono: var(--font-jetbrains);
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}
+
+/* Beat 1 — breathing gradient wash (spec §3: "gradient breathes") */
+.hero-wash {
+  position: absolute;
+  inset: -10%;
+  background:
+    radial-gradient(60% 50% at 20% 20%, var(--color-wash-lavender) 0%, transparent 70%),
+    radial-gradient(50% 45% at 80% 25%, var(--color-wash-sky) 0%, transparent 70%),
+    radial-gradient(55% 55% at 55% 85%, var(--color-wash-blush) 0%, transparent 70%);
+  animation: hero-breathe 14s ease-in-out infinite alternate;
+}
+
+@keyframes hero-breathe {
+  from {
+    transform: scale(1) translateY(0);
+  }
+  to {
+    transform: scale(1.06) translateY(-1.5%);
+  }
+}
+
+/* Availability badge pulse */
+.badge-dot {
+  animation: badge-pulse 2.4s ease-in-out infinite;
+}
+
+@keyframes badge-pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.35;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-wash,
+  .badge-dot {
+    animation: none;
+  }
+}
