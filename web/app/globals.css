@@ -93,3 +93,14 @@ html {
       transparent 70%
     );
 }
+
+/* Beats 3–4 — the palette resolves to calm pastels (spec §2 palette story).
+   Static gradient, no animation. */
+.calm-wash {
+  position: absolute;
+  inset: -10%;
+  z-index: -1;
+  background:
+    radial-gradient(55% 45% at 30% 20%, var(--color-wash-lavender) 0%, transparent 70%),
+    radial-gradient(50% 50% at 75% 70%, var(--color-wash-sky) 0%, transparent 70%);
+}
