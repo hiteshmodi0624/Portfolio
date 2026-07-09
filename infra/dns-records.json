@@ -7,9 +7,27 @@
   },
   {
     "name": "www",
+    "type": "CNAME",
+    "ttlSeconds": 3600,
+    "values": ["hiteshmodi.in"]
+  },
+  {
+    "name": "ftp",
     "type": "A",
-    "ttlSeconds": 300,
-    "values": ["66.33.60.66", "76.76.21.22"]
+    "ttlSeconds": 1800,
+    "values": ["82.180.142.168"]
+  },
+  {
+    "name": "blog",
+    "type": "CNAME",
+    "ttlSeconds": 14400,
+    "values": ["cname.vercel-dns.com"]
+  },
+  {
+    "name": "*",
+    "type": "CNAME",
+    "ttlSeconds": 14400,
+    "values": ["cname.vercel-dns.com"]
   },
   {
     "name": "@",

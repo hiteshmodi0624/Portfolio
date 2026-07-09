@@ -37,12 +37,33 @@ describe('PublicDnsStack — seeded records (dns-records.json)', () => {
     })
   })
 
-  it('creates a www A record with both IPs and TTL 300', () => {
+  it('creates a www CNAME to the apex', () => {
     template.hasResourceProperties('AWS::Route53::RecordSet', {
       Name: 'www.hiteshmodi.in.',
+      Type: 'CNAME',
+      TTL: '3600',
+      ResourceRecords: ['hiteshmodi.in'],
+    })
+  })
+
+  it('creates ftp A, blog CNAME, and wildcard CNAME records', () => {
+    template.hasResourceProperties('AWS::Route53::RecordSet', {
+      Name: 'ftp.hiteshmodi.in.',
       Type: 'A',
-      TTL: '300',
-      ResourceRecords: ['66.33.60.66', '76.76.21.22'],
+      TTL: '1800',
+      ResourceRecords: ['82.180.142.168'],
+    })
+    template.hasResourceProperties('AWS::Route53::RecordSet', {
+      Name: 'blog.hiteshmodi.in.',
+      Type: 'CNAME',
+      TTL: '14400',
+      ResourceRecords: ['cname.vercel-dns.com'],
+    })
+    template.hasResourceProperties('AWS::Route53::RecordSet', {
+      Name: '*.hiteshmodi.in.',
+      Type: 'CNAME',
+      TTL: '14400',
+      ResourceRecords: ['cname.vercel-dns.com'],
     })
   })
 
