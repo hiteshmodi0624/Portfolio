@@ -2,10 +2,11 @@
 # scripts/deploy-prod.sh — the one deploy command: npm run deploy:prod
 #
 # Idempotent and delegation-aware: safe to re-run any time. Chains the
-# account guard, the local verify gate, the DNS stack, auto-resolved
-# CloudFormation outputs (never hand-copied), delegation-aware domain
-# enablement, a two-pass S3 sync + CloudFront invalidation, and a health
-# check. The only thing this script cannot do is switch nameservers at the
+# account guard, the local verify gate, the zone-only DNS stack + record
+# sync (infra/scripts/sync-dns.ts applies dns-records.json straight to
+# Route53), auto-resolved CloudFormation outputs (never hand-copied),
+# delegation-aware domain enablement, a two-pass S3 sync + CloudFront
+# invalidation, and a health check. The only thing this script cannot do is switch nameservers at the
 # registrar (Hostinger) — that's outside AWS entirely.
 #
 # Usage:
@@ -123,9 +124,19 @@ fi
 banner "Building web static export (fresh web/out for this deploy)"
 npm run build -w web
 
-# --- c. DNS stack, every run, idempotent ---------------------------------
-banner "Deploying PortfolioDns (idempotent every run)"
+# --- c. DNS: zone-only stack, then record sync, every run, idempotent -----
+# The PortfolioDns stack owns ONLY the hosted zone. Records are applied by
+# infra/scripts/sync-dns.ts straight against the Route53 API — records never
+# pass through CloudFormation (two production incidents came from CFN owning
+# record sets). The sync script protects NS/SOA, alias records (the
+# CloudFront apex/www aliases), and the ACM validation CNAME; a bad entry in
+# dns-records.json (apex '@' A record, any 'www' entry) fails loudly at
+# load time via schema validation instead of being gated here.
+banner "Deploying PortfolioDns zone-only stack (idempotent every run)"
 (cd infra && npx cdk deploy --app "npx tsx bin/dns.ts" --require-approval never)
+
+banner "Syncing DNS records from infra/dns-records.json (apply)"
+npm run sync:dns -w infra -- --apply
 
 # --- d. auto-resolve DNS outputs from CloudFormation (no hand-copied ids) -
 banner "Resolving PortfolioDns outputs"
@@ -160,19 +171,9 @@ if [ -n "$PUBLIC_NS_SORTED" ] && [ "$PUBLIC_NS_SORTED" = "$ZONE_NS_SORTED" ]; th
   DELEGATED=1
 fi
 
-# Both the apex ("@") and "www" now structurally conflict with what
-# PortfolioSiteStack creates: ApexAlias/ApexAliasV6 target the bare zone name,
-# WwwAlias/WwwAliasV6 target "www.<domain>", and distribution.domainNames is
-# [domainName, "www.<domain>"]. A static record of ANY type at either name
-# (e.g. the old "www" CNAME) would conflict with the stack-owned alias
-# records, so both are checked here.
-HAS_STATIC_DOMAIN_RECORDS="$(node -e '
-  const fs = require("fs");
-  const recs = JSON.parse(fs.readFileSync("infra/dns-records.json", "utf8"));
-  const bad = recs.some((r) => (r.type === "A" && r.name === "@") || r.name === "www");
-  console.log(bad ? "yes" : "no");
-')"
-
+# Note: conflicting static apex ('@' A) / 'www' entries in dns-records.json
+# are no longer gated here — loadDnsRecords rejects them at load time (the
+# sync:dns step above fails loudly before this point is ever reached).
 DOMAIN_MODE=0
 if [ "$DELEGATED" -eq 0 ]; then
   DOMAIN_MODE=0
@@ -186,22 +187,10 @@ if [ "$DELEGATED" -eq 0 ]; then
   echo ""
   echo "Then re-run: npm run deploy:prod"
   echo "------------------------------------------------------------"
-elif [ "$HAS_STATIC_DOMAIN_RECORDS" = "yes" ]; then
-  DOMAIN_MODE=0
-  echo "------------------------------------------------------------"
-  echo "DNS is delegated, but infra/dns-records.json still has a static"
-  echo "apex '@' A record or a 'www' entry. Those conflict with the"
-  echo "CloudFront alias records the stack owns for the same names."
-  echo ""
-  echo "Deploying PortfolioSite WITHOUT the custom domain for now."
-  echo "Remove the apex '@' A entry and any 'www' entries from"
-  echo "infra/dns-records.json (a git-tracked edit — this script will not"
-  echo "touch the file), then re-run: npm run deploy:prod"
-  echo "------------------------------------------------------------"
 else
   DOMAIN_MODE=1
-  echo "DNS delegated and no conflicting static apex/www records — deploying"
-  echo "PortfolioSite WITH domainName=$APEX_DOMAIN (ACM cert + aliases)."
+  echo "DNS delegated — deploying PortfolioSite WITH"
+  echo "domainName=$APEX_DOMAIN (ACM cert + aliases)."
 fi
 
 # --- e (cont). domain-downgrade guard -------------------------------------
@@ -231,9 +220,9 @@ if [ "$DOMAIN_MODE" -eq 0 ]; then
       echo "DELETE the live ACM cert and the apex alias records for" >&2
       echo "$APEX_DOMAIN." >&2
       echo "" >&2
-      echo "This delegation check says 'not delegated' (or a conflicting" >&2
-      echo "static A record was found) — that is usually a stale/transient" >&2
-      echo "answer, not an actual intent to remove the custom domain." >&2
+      echo "This delegation check says 'not delegated' — that is usually a" >&2
+      echo "stale/transient answer, not an actual intent to remove the" >&2
+      echo "custom domain." >&2
       echo "" >&2
       echo "If you REALLY intend to remove the custom domain, re-run with:" >&2
       echo "    npm run deploy:prod -- --force-domain-removal" >&2
@@ -314,8 +303,6 @@ echo ""
 echo "Remaining manual step(s):"
 if [ "$DELEGATED" -eq 0 ]; then
   echo "  - Switch $APEX_DOMAIN's nameservers at Hostinger to the PortfolioDns nameservers above, then re-run npm run deploy:prod."
-elif [ "$HAS_STATIC_DOMAIN_RECORDS" = "yes" ]; then
-  echo "  - Remove the '@' A record and any 'www' entries from infra/dns-records.json, then re-run npm run deploy:prod."
 else
   echo "  - None — domain mode is fully active."
 fi

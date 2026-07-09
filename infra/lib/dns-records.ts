@@ -58,6 +58,22 @@ function parseRecord(entry: unknown, index: number): DnsRecord {
     )
   }
 
+  if (name === 'www') {
+    throw new Error(
+      `${prefix} rejects "www" — www is owned by the PortfolioSite CloudFront stack as an ` +
+        `alias record (both A and AAAA); a JSON-applied record here would conflict with it. ` +
+        `Remove this entry.`,
+    )
+  }
+  if (name === '@' && type === 'A') {
+    throw new Error(
+      `${prefix} rejects "@" with type "A" — the apex A record is owned by the ` +
+        `PortfolioSite CloudFront stack as an alias record; a static A record here would ` +
+        `conflict with it. Remove this entry — the apex is managed by the CDK stack, not ` +
+        `dns-records.json.`,
+    )
+  }
+
   if (typeof ttlSeconds !== 'number' || !Number.isInteger(ttlSeconds) || ttlSeconds <= 0) {
     throw new Error(
       `${prefix} has invalid "ttlSeconds" ${JSON.stringify(ttlSeconds)} — must be a positive integer`,
@@ -81,8 +97,8 @@ function parseRecord(entry: unknown, index: number): DnsRecord {
 /**
  * Loads dns-records.json from disk. A missing file is not an error — it means
  * "no extra records yet". A malformed file is always an error, wrapped with a
- * consistent "Invalid DNS records file: …" prefix so diff:dns/deploy:dns fail
- * loudly and point at the JSON file, not at CDK internals.
+ * consistent "Invalid DNS records file: …" prefix so sync:dns fails
+ * loudly and points at the JSON file, not at AWS internals.
  */
 export function loadDnsRecords(filePath: string): DnsRecord[] {
   if (!fs.existsSync(filePath)) {

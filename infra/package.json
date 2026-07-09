@@ -8,7 +8,8 @@
     "cdk": "cdk",
     "synth": "cdk synth",
     "deploy": "cdk deploy --require-approval never",
-    "diff:dns": "cdk diff --app \"npx tsx bin/dns.ts\"",
+    "sync:dns": "tsx scripts/sync-dns.ts",
+    "diff:dns": "tsx scripts/sync-dns.ts",
     "deploy:dns": "cdk deploy --app \"npx tsx bin/dns.ts\" --require-approval never"
   },
   "dependencies": {
