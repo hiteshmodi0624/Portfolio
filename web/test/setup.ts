@@ -1,18 +1,25 @@
 import { beforeEach, vi } from 'vitest'
 
-// jsdom implements neither matchMedia nor IntersectionObserver.
-// motion (motion/react) needs both: useReducedMotion -> matchMedia,
-// whileInView -> IntersectionObserver.
+// jsdom implements none of matchMedia / IntersectionObserver / ResizeObserver.
+// motion (motion/react) needs all three: useReducedMotion -> matchMedia,
+// whileInView/useInView -> IntersectionObserver, useScroll -> ResizeObserver.
 
 let reducedMotion = false
+let wideViewport = false
 
 /** Toggle the simulated `prefers-reduced-motion` media query for a test. */
 export function setPrefersReducedMotion(value: boolean): void {
   reducedMotion = value
 }
 
+/** Toggle the simulated `(min-width: 768px)` query — ScrollScene's scrub gate. */
+export function setViewportWide(value: boolean): void {
+  wideViewport = value
+}
+
 beforeEach(() => {
   reducedMotion = false
+  wideViewport = false
 })
 
 Object.defineProperty(window, 'matchMedia', {
@@ -20,7 +27,9 @@ Object.defineProperty(window, 'matchMedia', {
   value: (query: string): MediaQueryList =>
     ({
       get matches() {
-        return query.includes('prefers-reduced-motion') ? reducedMotion : false
+        if (query.includes('prefers-reduced-motion')) return reducedMotion
+        if (query.includes('min-width: 768px')) return wideViewport
+        return false
       },
       media: query,
       onchange: null,
@@ -47,4 +56,15 @@ class IntersectionObserverStub {
 Object.defineProperty(window, 'IntersectionObserver', {
   writable: true,
   value: IntersectionObserverStub,
+})
+
+class ResizeObserverStub {
+  observe(): void {}
+  unobserve(): void {}
+  disconnect(): void {}
+}
+
+Object.defineProperty(window, 'ResizeObserver', {
+  writable: true,
+  value: ResizeObserverStub,
 })
