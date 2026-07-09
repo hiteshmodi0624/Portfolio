@@ -7,7 +7,9 @@
     "test": "vitest run",
     "cdk": "cdk",
     "synth": "cdk synth",
-    "deploy": "cdk deploy --require-approval never"
+    "deploy": "cdk deploy --require-approval never",
+    "diff:dns": "cdk diff --app \"npx tsx bin/dns.ts\"",
+    "deploy:dns": "cdk deploy --app \"npx tsx bin/dns.ts\" --require-approval never"
   },
   "dependencies": {
     "aws-cdk-lib": "^2.190.0",

@@ -72,3 +72,71 @@ The old Vercel site stays live until the CloudFront URL is verified.
 
 **Rollback:** point DNS back at Vercel. The distribution keeps serving on its
 CloudFront domain either way.
+
+## DNS maintenance
+
+DNS for `hiteshmodi.in` is managed by its own CDK app (`bin/dns.ts` /
+`PublicDnsStack`), independent of `PortfolioSite`. **`infra/dns-records.json`
+is the single source of truth for every record; the AWS Console is never
+touched.** `npm run diff:dns` / `npm run deploy:dns` are the only sanctioned
+way to change DNS.
+
+### Change flow
+
+1. Edit `infra/dns-records.json` (add/change/remove a record). Malformed
+   entries (bad `type`, non-positive `ttlSeconds`, empty `values`, a `name`
+   with a trailing dot or the apex domain baked in) fail loudly at
+   `loadDnsRecords` — if `diff:dns`/`deploy:dns` errors immediately with
+   `Invalid DNS records file: …`, the JSON file is the bug, not CDK/AWS.
+2. ```bash
+   cd infra
+   npm run diff:dns
+   ```
+   Confirm only the intended record changed.
+3. ```bash
+   npm run deploy:dns
+   ```
+4. Verify against an **external** resolver, not your machine's (a local
+   resolver can cache a stale answer):
+   ```bash
+   dig @8.8.8.8 hiteshmodi.in A
+   ```
+
+### Migrating DNS from Vercel to Route53
+
+The zone is pre-seeded with the exact records Vercel's DNS answers today
+(apex/`www` A, Google Workspace MX, the Google site-verification TXT), so
+delegating the domain to Route53 is a no-op for the site and for mail — the
+answers don't change, only who serves them.
+
+1. `npm run deploy:dns` creates the hosted zone, pre-seeded with the current
+   records from `dns-records.json`.
+2. **Before touching the registrar**, verify the new zone answers match
+   `dig @8.8.8.8` by querying the zone's own name servers directly (printed
+   as the `NameServers` stack output):
+   ```bash
+   dig @<ns1-from-output> hiteshmodi.in A
+   dig @<ns1-from-output> www.hiteshmodi.in A
+   dig @<ns1-from-output> hiteshmodi.in MX
+   dig @<ns1-from-output> hiteshmodi.in TXT
+   ```
+3. Switch NS at the registrar to the four `NameServers` printed by the
+   `deploy:dns` output.
+4. Wait for propagation. Verify mail flow (send/receive) and that the site is
+   still reachable — at this point traffic is still Vercel-served, Route53 is
+   just answering the same way Vercel's DNS did.
+5. **Cutover to CloudFront** (later, separate step): remove the `@` A and
+   `www` A entries from `dns-records.json` and run `deploy:dns`, then deploy
+   `PortfolioSite` with `-c domainName=hiteshmodi.in -c hostedZoneId=<id>`
+   (creates the alias A/AAAA records + ACM cert against the same zone). A
+   static `A` record and a CloudFront alias `A` record cannot coexist for the
+   same name — the JSON entries must be removed first, or the deploy will
+   conflict.
+6. **Rollback:** re-add the removed Vercel `A` records to `dns-records.json`
+   and run `deploy:dns`.
+
+**Known gap:** no SPF or DMARC TXT records exist in the current DNS today —
+this is inherited from the existing setup, not introduced by this migration.
+Adding `"v=spf1 include:_spf.google.com ~all"` and a DMARC policy is a
+worthwhile follow-up, but a deliberate decision (DMARC policy strictness
+affects mail deliverability) rather than something to auto-add here.

@@ -1,0 +1,32 @@
+[
+  {
+    "name": "@",
+    "type": "A",
+    "ttlSeconds": 300,
+    "values": ["66.33.60.129", "76.76.21.164"]
+  },
+  {
+    "name": "www",
+    "type": "A",
+    "ttlSeconds": 300,
+    "values": ["66.33.60.66", "76.76.21.22"]
+  },
+  {
+    "name": "@",
+    "type": "MX",
+    "ttlSeconds": 3600,
+    "values": [
+      "1 aspmx.l.google.com",
+      "5 alt1.aspmx.l.google.com",
+      "5 alt2.aspmx.l.google.com",
+      "10 alt3.aspmx.l.google.com",
+      "10 alt4.aspmx.l.google.com"
+    ]
+  },
+  {
+    "name": "@",
+    "type": "TXT",
+    "ttlSeconds": 3600,
+    "values": ["google-site-verification=T5Af1FA2o07_ixPaI7V6OukoUJ7pJ-4dlGOjXckTsMs"]
+  }
+]
