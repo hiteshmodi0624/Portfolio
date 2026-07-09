@@ -12,12 +12,6 @@
     "values": ["cname.vercel-dns.com"]
   },
   {
-    "name": "*",
-    "type": "CNAME",
-    "ttlSeconds": 14400,
-    "values": ["cname.vercel-dns.com"]
-  },
-  {
     "name": "@",
     "type": "MX",
     "ttlSeconds": 3600,
