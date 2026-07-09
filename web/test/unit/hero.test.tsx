@@ -37,6 +37,14 @@ describe('Hero', () => {
     expect(normalizedText).toBe('A little magic for your business.')
     // Under reduced motion, SparkleField returns null, so no canvas
     expect(container.querySelector('canvas')).toBeNull()
+    // Assert that NO word span carries hidden-state inline styles
+    const wordSpans = h1.querySelectorAll('span')
+    wordSpans.forEach((span) => {
+      const transform = span.style.transform
+      const opacity = span.style.opacity
+      expect(transform === '' || transform === 'none').toBe(true)
+      expect(opacity === '' || opacity === '1').toBe(true)
+    })
   })
 
   it('renders the word "magic" with text-violet class', () => {

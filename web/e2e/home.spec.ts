@@ -74,10 +74,6 @@ test.describe('prefers-reduced-motion', () => {
     const h1 = page.getByRole('heading', { level: 1 })
     await expect(h1).toBeVisible()
     const h1Transform = await h1.evaluate((el) => getComputedStyle(el).transform)
-    const h1Text = `h1 has transform: ${h1Transform}`
-    if (h1Transform !== 'none') {
-      console.log(h1Text)
-    }
     expect(h1Transform).toBe('none')
     const firstWord = h1.locator('span').first()
     const firstWordTransform = await firstWord.evaluate((el) => getComputedStyle(el).transform)
