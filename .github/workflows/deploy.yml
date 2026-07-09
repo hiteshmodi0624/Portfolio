@@ -24,6 +24,7 @@ jobs:
       - run: npm run test:unit -w web
       - run: npm run test -w infra
       - run: npm run build -w web
+      - run: npm run budget -w web
       - run: npx playwright install --with-deps chromium
         working-directory: web
       - run: npm run test:e2e -w web
