@@ -74,3 +74,22 @@ html {
     animation: none;
   }
 }
+
+/* Beat 2 — hot chaos wash (spec §2: chaos uses alert hues #FFA94D / #FF6B6B).
+   Static gradient, no animation, so no reduced-motion override needed. */
+.chaos-wash {
+  position: absolute;
+  inset: -10%;
+  z-index: -1;
+  background:
+    radial-gradient(
+      55% 45% at 25% 25%,
+      color-mix(in srgb, var(--color-chaos-amber) 20%, transparent) 0%,
+      transparent 70%
+    ),
+    radial-gradient(
+      50% 50% at 75% 65%,
+      color-mix(in srgb, var(--color-chaos-red) 16%, transparent) 0%,
+      transparent 70%
+    );
+}
