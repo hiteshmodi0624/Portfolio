@@ -29,7 +29,7 @@ describe('ProfileSchema', () => {
   })
 
   it('rejects a missing name', () => {
-    const { name: _name, ...rest } = validProfile
+    const rest = Object.fromEntries(Object.entries(validProfile).filter(([k]) => k !== 'name'))
     expect(ProfileSchema.safeParse(rest).success).toBe(false)
   })
 

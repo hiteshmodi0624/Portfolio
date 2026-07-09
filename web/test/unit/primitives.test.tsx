@@ -1,5 +1,5 @@
-import { fireEvent, render, screen, waitFor } from '@testing-library/react'
-import { describe, expect, it, vi, beforeEach, afterEach } from 'vitest'
+import { fireEvent, render, screen } from '@testing-library/react'
+import { describe, expect, it, vi } from 'vitest'
 import { CountUp } from '../../components/ui/count-up'
 import { GlassCard } from '../../components/ui/glass-card'
 import { TiltCard } from '../../components/ui/tilt-card'

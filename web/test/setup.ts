@@ -68,7 +68,7 @@ export function triggerIntersection(
       time: Date.now(),
     }
     instance.entries.set(target, entry)
-    instance.callback([entry], { root: null, rootMargin: '', thresholds: [0.5] } as any)
+    instance.callback([entry], { root: null, rootMargin: '', thresholds: [0.5] } as unknown as IntersectionObserver)
   }
 }
 
