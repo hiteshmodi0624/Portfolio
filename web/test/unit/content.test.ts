@@ -15,6 +15,11 @@ const validProfile = {
     ctaLabel: 'Start your project',
     ctaHref: '#finale',
     scrollCue: 'show me how ↓',
+    identity: {
+      name: 'Hitesh Modi',
+      line: 'builds these end-to-end, replies same day',
+      photo: { src: '/images/hitesh-96.jpg', alt: 'Hitesh Modi — portrait' },
+    },
   },
   finale: {
     heading: "Let's build your magic",
@@ -42,6 +47,40 @@ describe('ProfileSchema', () => {
     const bad = {
       ...validProfile,
       finale: { ...validProfile.finale, calUrl: 'http://cal.com/hiteshmodi' },
+    }
+    expect(ProfileSchema.safeParse(bad).success).toBe(false)
+  })
+
+  it('rejects a hero without identity (P3.2)', () => {
+    const { identity: _identity, ...heroRest } = validProfile.hero
+    const bad = { ...validProfile, hero: heroRest }
+    expect(ProfileSchema.safeParse(bad).success).toBe(false)
+  })
+
+  it('rejects an identity photo without alt text', () => {
+    const bad = {
+      ...validProfile,
+      hero: {
+        ...validProfile.hero,
+        identity: {
+          ...validProfile.hero.identity,
+          photo: { src: '/images/hitesh-96.jpg', alt: '' },
+        },
+      },
+    }
+    expect(ProfileSchema.safeParse(bad).success).toBe(false)
+  })
+
+  it('rejects an identity photo outside /images/', () => {
+    const bad = {
+      ...validProfile,
+      hero: {
+        ...validProfile.hero,
+        identity: {
+          ...validProfile.hero.identity,
+          photo: { src: 'https://cdn.example.com/hitesh.jpg', alt: 'Hitesh Modi — portrait' },
+        },
+      },
     }
     expect(ProfileSchema.safeParse(bad).success).toBe(false)
   })
@@ -81,5 +120,12 @@ describe('shipped content', () => {
     for (const url of [profile.siteUrl, profile.finale.calUrl]) {
       expect(url.startsWith('https://')).toBe(true)
     }
+  })
+
+  it('ships the hero identity chip content (P3.2)', () => {
+    expect(profile.hero.identity.name).toBe('Hitesh Modi')
+    expect(profile.hero.identity.line).toBe('builds these end-to-end, replies same day')
+    expect(profile.hero.identity.photo.src).toBe('/images/hitesh-96.jpg')
+    expect(profile.hero.identity.photo.alt.length).toBeGreaterThan(0)
   })
 })

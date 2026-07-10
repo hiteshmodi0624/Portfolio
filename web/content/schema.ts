@@ -13,6 +13,16 @@ export const HeroContentSchema = z.object({
   /** In-page anchor the CTA and scroll cue jump to, e.g. "#finale". */
   ctaHref: z.string().regex(/^#[a-z][a-z-]*$/),
   scrollCue: z.string().min(1),
+  /** P3.2 hero identity: photo chip + name line under the subhead. */
+  identity: z.object({
+    name: z.string().min(1),
+    line: z.string().min(1),
+    photo: z.object({
+      /** Committed, EXIF-stripped asset under public/images/ (never the original). */
+      src: z.string().regex(/^\/images\/[a-z0-9.-]+\.(jpg|jpeg|png|webp)$/),
+      alt: z.string().min(1),
+    }),
+  }),
 })
 
 export const FinaleContentSchema = z.object({

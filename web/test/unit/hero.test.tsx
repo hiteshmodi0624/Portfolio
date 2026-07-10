@@ -83,4 +83,14 @@ describe('Hero', () => {
     expect(magicSpan).toBeDefined()
     expect(magicSpan?.classList.contains('text-violet')).toBe(true)
   })
+
+  it('renders the identity chip: 48px photo with real alt + name line (P3.2)', () => {
+    render(<Hero hero={profile.hero} />)
+    const img = screen.getByRole('img', { name: 'Hitesh Modi — portrait' })
+    expect(img.getAttribute('src')).toBe('/images/hitesh-96.jpg')
+    expect(img.getAttribute('width')).toBe('48')
+    expect(img.getAttribute('height')).toBe('48')
+    expect(screen.getByText('Hitesh Modi')).toBeDefined()
+    expect(screen.getByText(/builds these end-to-end, replies same day/)).toBeDefined()
+  })
 })

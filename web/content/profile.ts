@@ -12,6 +12,11 @@ export const profile: Profile = ProfileSchema.parse({
     ctaLabel: 'Start your project',
     ctaHref: '#finale',
     scrollCue: 'show me how ↓',
+    identity: {
+      name: 'Hitesh Modi',
+      line: 'builds these end-to-end, replies same day',
+      photo: { src: '/images/hitesh-96.jpg', alt: 'Hitesh Modi — portrait' },
+    },
   },
   finale: {
     heading: "Let's build your magic",
