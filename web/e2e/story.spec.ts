@@ -11,7 +11,7 @@ const BEATS = [
  * pinned page ran ~13 viewports of runway; unpinning drops it below 8.
  * Raised by ~1 per NEW CONTENT SECTION as P3.2 (human) and P3.3 (services)
  * land — the budget guards against pinned emptiness, not against content. */
-const MAX_PAGE_VIEWPORTS = 8
+const MAX_PAGE_VIEWPORTS = 9
 
 /** Scroll a section's top to the viewport top, instantly (the site sets
  * scroll-behavior: smooth; tests must not animate there), ONCE — the
@@ -30,7 +30,15 @@ test.describe('story beats 2–5 (content)', () => {
     const labels = await page
       .locator('main > section')
       .evaluateAll((sections) => sections.map((section) => section.getAttribute('aria-label')))
-    expect(labels).toEqual(['Intro', 'The chaos', 'The turn', 'The storefront', 'Proof', 'Contact'])
+    expect(labels).toEqual([
+      'Intro',
+      'The chaos',
+      'The turn',
+      'The storefront',
+      'Proof',
+      'The human',
+      'Contact',
+    ])
   })
 
   test('proof gallery and results ticker carry the shipped content', async ({ page }) => {
@@ -260,6 +268,23 @@ test.describe('mobile-light (375px)', () => {
       () => document.documentElement.scrollWidth <= document.documentElement.clientWidth,
     )
     expect(noHorizontalPan).toBe(true)
+  })
+})
+
+test.describe('human (beat 7, P3.2)', () => {
+  test('renders heading, photo, and an openable nerdy-bits disclosure', async ({ page }) => {
+    await page.goto('/')
+    const section = page.locator('section[aria-label="The human"]')
+    await section.scrollIntoViewIfNeeded()
+    await expect(section.getByRole('heading', { name: 'One engineer, no circus' })).toBeVisible()
+    const photo = section.locator('img')
+    await expect(photo).toBeVisible()
+    await expect(photo).toHaveAttribute('alt', /.+/)
+    const details = section.locator('details')
+    await expect(details).not.toHaveAttribute('open')
+    await section.locator('summary').click()
+    await expect(details).toHaveAttribute('open', '')
+    await expect(section.getByText(/MCP servers/)).toBeVisible()
   })
 })
 

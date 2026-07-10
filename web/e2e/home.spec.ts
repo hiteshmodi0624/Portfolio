@@ -168,3 +168,16 @@ test.describe('hero entrance animation (normal motion)', () => {
     expect(firstWordTransform).toBe('none')
   })
 })
+
+test.describe('hero identity (P3.2)', () => {
+  test('renders the name line and a photo chip with non-empty alt', async ({ page }) => {
+    await page.goto('/')
+    const hero = page.locator('section[aria-label="Intro"]')
+    await expect(hero.getByText('Hitesh Modi', { exact: true })).toBeVisible()
+    await expect(hero.getByText(/builds these end-to-end, replies same day/)).toBeVisible()
+    const img = hero.locator('img')
+    await expect(img).toBeVisible()
+    const alt = await img.getAttribute('alt')
+    expect(alt !== null && alt.length > 0).toBe(true)
+  })
+})
