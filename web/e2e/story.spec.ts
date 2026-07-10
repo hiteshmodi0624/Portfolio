@@ -1,4 +1,4 @@
-import { expect, test, type Page } from '@playwright/test'
+import { expect, test, type Locator } from '@playwright/test'
 
 const BEATS = [
   { label: 'The chaos', heading: 'Your week right now' },
@@ -7,20 +7,21 @@ const BEATS = [
   { label: 'Proof', heading: 'Built before. Shipped before.' },
 ] as const
 
-/** Scroll the window to the start or end of a pinned section, instantly
- * (the site sets scroll-behavior: smooth; tests must not animate there). */
-async function scrollToPin(page: Page, label: string, position: 'start' | 'end') {
-  await page.evaluate(
-    ({ label, position }) => {
-      const section = document.querySelector(`section[aria-label="${label}"]`)
-      if (!section) throw new Error(`no section ${label}`)
-      const rect = section.getBoundingClientRect()
-      const top = rect.top + window.scrollY
-      const target = position === 'start' ? top + 1 : top + rect.height - window.innerHeight
-      window.scrollTo({ top: target, behavior: 'instant' })
-    },
-    { label, position },
-  )
+/** Desktop page-height budget in viewport-heights (spec §6 P3.1). The old
+ * pinned page ran ~13 viewports of runway; unpinning drops it below 8.
+ * Raised by ~1 per NEW CONTENT SECTION as P3.2 (human) and P3.3 (services)
+ * land — the budget guards against pinned emptiness, not against content. */
+const MAX_PAGE_VIEWPORTS = 8
+
+/** Scroll a section's top to the viewport top, instantly (the site sets
+ * scroll-behavior: smooth; tests must not animate there), ONCE — the
+ * natural-scroll tests then assert with no further scrolling. */
+async function scrollSectionIntoView(page: import('@playwright/test').Page, label: string) {
+  await page.evaluate((sectionLabel) => {
+    const section = document.querySelector(`section[aria-label="${sectionLabel}"]`)
+    if (!section) throw new Error(`no section ${sectionLabel}`)
+    section.scrollIntoView({ behavior: 'instant', block: 'start' })
+  }, label)
 }
 
 test.describe('story beats 2–5 (content)', () => {
@@ -56,6 +57,11 @@ test.describe('story beats 2–5 (content)', () => {
       'href',
       'https://myquri.com',
     )
+    // Safewash's site went live in P3 (spec §3.5) — the card links out now
+    await expect(proof.getByRole('link', { name: /safewash\.co\.in/ })).toHaveAttribute(
+      'href',
+      'https://www.safewash.co.in',
+    )
     // the four client-work entries wear the pill (exact: true — plain getByText
     // is a case-insensitive substring match and would also hit the outcome
     // lines that begin with "Client work…")
@@ -74,64 +80,101 @@ test.describe('story beats 2–5 (content)', () => {
   })
 })
 
-test.describe('scroll scrub (desktop pin)', () => {
-  test.skip(({ isMobile }) => Boolean(isMobile), 'below 768px the beats ship the static light variant')
-
-  // No addInitScript neutralization here (p2-task-10 report, "Fix round 1"):
-  // the ScrollTimeline/ViewTimeline desync this used to work around was a
-  // REAL bug, not a Playwright-artifact — confirmed by direct repro against
-  // the production build with realistic, continuous mouse-wheel scrolling
-  // (no synthetic Playwright scroll pattern involved) — and root-caused to
-  // `useScroll`'s `['start start', 'end end']` offset mapping to the CSS
-  // named range `contain 0%`–`contain 100%`, which is only well-defined for
-  // a subject that fits inside the scrollport — never true for a 3-viewport-
-  // tall pinned section. Fixed in production
-  // (web/components/ui/scroll-scene.tsx sets motion-dom's public
-  // `supportsFlags.scrollTimeline/viewTimeline = false`), so this describe
-  // block now exercises the real, unmodified app.
-
-  test('chaos pins for multiple viewports and tumbles cards in', async ({ page }) => {
+test.describe('natural scroll (P3.1) — no pinning, time-driven scenes', () => {
+  test('zero sticky elements in main — the visitor always owns the wheel', async ({ page }) => {
     await page.goto('/')
-    const section = page.locator('section[aria-label="The chaos"]')
-    const height = await section.evaluate((el) => el.getBoundingClientRect().height)
-    const viewport = page.viewportSize()!
-    // pinned: the section reserves ~3 viewport-heights of scroll runway
-    expect(height).toBeGreaterThan(viewport.height * 2)
-
-    const invoice = page.getByText('$1,850 — three weeks overdue')
-    // at the top of the pin the card has not tumbled in yet…
-    await scrollToPin(page, 'The chaos', 'start')
-    await expect
-      .poll(() => invoice.evaluate((el) => getComputedStyle(el.closest('.absolute')!).opacity))
-      .toBe('0')
-    // …and by the end of the pin every card has settled
-    await scrollToPin(page, 'The chaos', 'end')
-    await expect
-      .poll(() => invoice.evaluate((el) => getComputedStyle(el.closest('.absolute')!).opacity))
-      .toBe('1')
-    await expect(page.getByText('47 unread. Six of them matter. Which six?')).toBeVisible()
+    await expect(page.locator('main .sticky')).toHaveCount(0)
   })
 
-  test('turn types its bubbles and storefront completes its morph by pin end', async ({ page }) => {
+  test('page height stays under the viewport budget (desktop, motion on)', async ({
+    page,
+    isMobile,
+  }) => {
+    test.skip(Boolean(isMobile), 'height budget is a desktop measure (spec §6 P3.1)')
     await page.goto('/')
-    await scrollToPin(page, 'The turn', 'end')
-    // TypedText has revealed the whole helper reply (first() = the typed
-    // copy; a visually-hidden duplicate exists for screen readers)
-    await expect(page.getByText('Want me to book you in?').first()).toBeVisible()
-    await expect(
-      page.getByText('You find out over coffee. Everything just… happened.').first(),
-    ).toBeVisible()
+    const ratio = await page.evaluate(
+      () => document.documentElement.scrollHeight / window.innerHeight,
+    )
+    expect(ratio).toBeLessThan(MAX_PAGE_VIEWPORTS)
+  })
 
-    await scrollToPin(page, 'The storefront', 'end')
-    // the morph layers carry data-morph anchors (see storefront.tsx MorphScene)
+  // Each scene's key element must settle at opacity 1 after ONE scroll that
+  // brings the section into view — no further scrolling — proving the
+  // choreography is time-driven, not scrubbed. Desktop-scoped: on 375px the
+  // sections are taller than the viewport, so per-element visibility is
+  // covered by the mobile-light describe below instead.
+  const SCENES: ReadonlyArray<{
+    label: string
+    probe: (section: Locator) => Locator
+    timeoutMs: number
+  }> = [
+    {
+      // last-ish card of the ~1.5s tumble choreography
+      label: 'The chaos',
+      probe: (section) =>
+        section.getByText('$1,850 — three weeks overdue').locator('xpath=ancestor::li[1]'),
+      timeoutMs: 8_000,
+    },
+    {
+      // the closer fades in after the cascade + typing complete
+      label: 'The turn',
+      probe: (section) =>
+        section.getByText('You find out over coffee. Everything just… happened.'),
+      timeoutMs: 12_000,
+    },
+    {
+      // the "after" layer crossfades in ~2s after entry (MORPH_DELAY_MS)
+      label: 'The storefront',
+      probe: (section) => section.locator('[data-morph="after"]'),
+      timeoutMs: 12_000,
+    },
+  ]
+
+  for (const scene of SCENES) {
+    test(`${scene.label}: key element settles visible after entering view — no extra scrolling`, async ({
+      page,
+      isMobile,
+    }) => {
+      test.skip(Boolean(isMobile), 'time-driven entry is proven on desktop; mobile readability is covered below')
+      await page.goto('/')
+      await scrollSectionIntoView(page, scene.label)
+      const target = scene.probe(page.locator(`section[aria-label="${scene.label}"]`))
+      await expect
+        .poll(() => target.evaluate((el) => getComputedStyle(el).opacity), {
+          timeout: scene.timeoutMs,
+        })
+        .toBe('1')
+    })
+  }
+
+  test('turn bubbles finish typing on a clock', async ({ page, isMobile }) => {
+    test.skip(Boolean(isMobile), 'time-driven entry is proven on desktop')
+    await page.goto('/')
+    await scrollSectionIntoView(page, 'The turn')
+    const turn = page.locator('section[aria-label="The turn"]')
+    // first() = the typed aria-hidden copy; an sr-only duplicate always exists
+    await expect(turn.getByText('Want me to book you in?').first()).toBeVisible({
+      timeout: 12_000,
+    })
+  })
+
+  test('storefront morph completes: after visible, before faded out', async ({
+    page,
+    isMobile,
+  }) => {
+    test.skip(Boolean(isMobile), 'time-driven entry is proven on desktop')
+    await page.goto('/')
+    await scrollSectionIntoView(page, 'The storefront')
     await expect
-      .poll(() =>
-        page.locator('[data-morph="after"]').evaluate((el) => getComputedStyle(el).opacity),
+      .poll(
+        () => page.locator('[data-morph="after"]').evaluate((el) => getComputedStyle(el).opacity),
+        { timeout: 12_000 },
       )
       .toBe('1')
     await expect
-      .poll(() =>
-        page.locator('[data-morph="before"]').evaluate((el) => getComputedStyle(el).opacity),
+      .poll(
+        () => page.locator('[data-morph="before"]').evaluate((el) => getComputedStyle(el).opacity),
+        { timeout: 12_000 },
       )
       .toBe('0')
     await expect(page.getByText('Saturday has three openings left.')).toBeVisible()
@@ -140,10 +183,10 @@ test.describe('scroll scrub (desktop pin)', () => {
 })
 
 test.describe('reduced motion — the story stays fully readable', () => {
-  test('beats 2–5 ship static variants: no pinning, all copy settles visible', async ({ page }) => {
+  test('beats 2–5: no pinning, all copy settles visible', async ({ page }) => {
     await page.emulateMedia({ reducedMotion: 'reduce' })
     await page.goto('/')
-    // no pinned emptiness anywhere: fallbacks never render the sticky pin
+    // natural scroll everywhere: nothing sticky, ever
     await expect(page.locator('main > section .sticky')).toHaveCount(0)
     for (const beat of BEATS) {
       const section = page.locator(`section[aria-label="${beat.label}"]`)
@@ -168,7 +211,7 @@ test.describe('reduced motion — the story stays fully readable', () => {
         )
         .toBe('1')
     }
-    // guard: no horizontal overflow from fallback wash variants
+    // guard: no horizontal overflow from wash backdrops
     const noHorizontalPan = await page.evaluate(
       () => document.documentElement.scrollWidth <= document.documentElement.clientWidth,
     )
@@ -177,9 +220,9 @@ test.describe('reduced motion — the story stays fully readable', () => {
 })
 
 test.describe('mobile-light (375px)', () => {
-  test.skip(({ isMobile }) => !isMobile, 'desktop ships the pinned scrub scenes')
+  test.skip(({ isMobile }) => !isMobile, 'the 375px readability pass runs on the mobile project')
 
-  test('beats 2–5 ship the light static variant and stay readable', async ({ page }) => {
+  test('beats 2–5 stay readable with the same time-driven entrances', async ({ page }) => {
     await page.goto('/')
     await expect(page.locator('main > section .sticky')).toHaveCount(0)
     for (const beat of BEATS) {
@@ -195,7 +238,7 @@ test.describe('mobile-light (375px)', () => {
         { timeout: 5000 },
       )
       .toBe('1')
-    // guard: no horizontal overflow from fallback wash variants
+    // guard: no horizontal overflow from wash backdrops
     const noHorizontalPan = await page.evaluate(
       () => document.documentElement.scrollWidth <= document.documentElement.clientWidth,
     )
@@ -204,9 +247,9 @@ test.describe('mobile-light (375px)', () => {
 })
 
 // ---------------------------------------------------------------------------
-// Carry-forward from Task 3: jsdom cannot observe rAF-driven repaints or real
-// pointer-type discrimination, so these two behaviors are proven here, in a
-// real browser, instead of in the unit suite.
+// Carry-forward from P2 Task 3: jsdom cannot observe rAF-driven repaints or
+// real pointer-type discrimination, so these two behaviors are proven here,
+// in a real browser, instead of in the unit suite.
 // ---------------------------------------------------------------------------
 
 test.describe('proof ticker CountUp — genuine entrance animation (normal motion)', () => {
