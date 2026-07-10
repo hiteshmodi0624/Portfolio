@@ -133,7 +133,7 @@ export function Cases({ cases }: CasesProps) {
                   href={item.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="mt-7 inline-block rounded-full bg-violet px-6 py-3 font-mono text-sm font-bold text-white shadow-lg shadow-violet/30 transition hover:bg-violet/90"
+                  className="mt-7 inline-block rounded-full bg-[#6741D9] px-6 py-3 font-mono text-sm font-bold text-white shadow-lg shadow-violet/30 transition hover:bg-[#6741D9]/90"
                 >
                   see it live → {host}
                 </a>
