@@ -51,6 +51,28 @@ export const ServiceSchema = z.object({
 
 export const ServicesSchema = z.array(ServiceSchema).min(1)
 
+/* ——— P3.2: beat 7 — the human (spec §3.4) ——— */
+
+export const HumanSchema = z.object({
+  heading: z.string().min(1),
+  name: z.string().min(1),
+  /** Short story paragraphs — plain words; the tech vocabulary lives in nerdyBits. */
+  story: z.array(z.string().min(1)).min(2),
+  /** Collapsed-by-default disclosure rendered as a native <details>. */
+  nerdyBits: z.object({
+    label: z.string().min(1),
+    items: z.array(z.string().min(1)).min(1),
+  }),
+  photo: z.object({
+    /** Committed, EXIF-stripped asset under public/images/ (never the original). */
+    src: z.string().regex(/^\/images\/[a-z0-9.-]+\.(jpg|jpeg|png|webp)$/),
+    alt: z.string().min(1),
+    /** Intrinsic pixel dimensions — rendered as width/height attrs (no CLS). */
+    width: z.number().int().positive(),
+    height: z.number().int().positive(),
+  }),
+})
+
 /* ——— P2: story beats 2–4 (spec §3) ——— */
 
 export const ChaosCardSchema = z.object({
@@ -166,6 +188,7 @@ export type HeroContent = z.infer<typeof HeroContentSchema>
 export type FinaleContent = z.infer<typeof FinaleContentSchema>
 export type Profile = z.infer<typeof ProfileSchema>
 export type Service = z.infer<typeof ServiceSchema>
+export type HumanContent = z.infer<typeof HumanSchema>
 export type StoryContent = z.infer<typeof StorySchema>
 export type Project = z.infer<typeof ProjectSchema>
 export type ProofContent = z.infer<typeof ProofSchema>
