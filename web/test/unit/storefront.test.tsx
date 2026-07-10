@@ -28,7 +28,7 @@ describe('Storefront (beat 4)', () => {
   it('renders the gorgeous after-page mock with its booking CTA', () => {
     renderStorefront()
     expect(screen.getByText('Saturday has three openings left.')).toBeDefined()
-    expect(screen.getByText('Pick a time — it takes under a minute.')).toBeDefined()
+    expect(screen.getByText('Pick a time. It takes under a minute.')).toBeDefined()
     expect(screen.getByText('Book Saturday')).toBeDefined()
   })
 

@@ -197,11 +197,11 @@ describe('shipped story content', () => {
 
     // Customer dialogue — turn event with curly quotes (left and right double quotation marks)
     const customerMessage = story.turn.events.find((event) => event.id === 'customer-message')
-    expect(customerMessage?.text).toBe('“Hey — do you have anything free this Saturday?”')
+    expect(customerMessage?.text).toBe('“Hey, do you have anything free this Saturday?”')
 
     // Helper dialogue reply — turn event with curly quotes (left and right double quotation marks)
     const helperReply = story.turn.events.find((event) => event.id === 'helper-reply')
-    expect(helperReply?.text).toBe('“We do — 10:30 on Saturday just opened up. Want me to book you in?”')
+    expect(helperReply?.text).toBe('“We do! 10:30 on Saturday just opened up. Want me to book you in?”')
   })
 
   it('ships the eight proof projects with the verified live urls', () => {

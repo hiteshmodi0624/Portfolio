@@ -14,7 +14,9 @@ describe('Proof (beat 5)', () => {
       'Built before. Shipped before.',
     )
     expect(
-      screen.getByText('Real products with real customers — built end-to-end, not mocked up.'),
+      screen.getByText(
+        'Real products with real customers, built end-to-end. Every link below is live. Go click around.',
+      ),
     ).toBeDefined()
   })
 

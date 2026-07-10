@@ -18,7 +18,7 @@ export const story: StoryContent = StorySchema.parse({
         kind: 'invoice',
         hue: 'red',
         title: 'Invoice #114',
-        body: '$1,850 — three weeks overdue',
+        body: '$1,850, three weeks overdue',
         meta: 'You keep meaning to chase it',
       },
       {
@@ -63,21 +63,21 @@ export const story: StoryContent = StorySchema.parse({
         id: 'customer-message',
         kind: 'customer',
         wash: 'sky',
-        text: '“Hey — do you have anything free this Saturday?”',
+        text: '“Hey, do you have anything free this Saturday?”',
         meta: '2:14 AM',
       },
       {
         id: 'helper-reply',
         kind: 'helper',
         wash: 'lavender',
-        text: '“We do — 10:30 on Saturday just opened up. Want me to book you in?”',
+        text: '“We do! 10:30 on Saturday just opened up. Want me to book you in?”',
         meta: 'Answered in 4 seconds',
       },
       {
         id: 'booking-confirmed',
         kind: 'event',
         wash: 'sky',
-        text: 'Booking confirmed — Saturday, 10:30 AM',
+        text: 'Booking confirmed for Saturday, 10:30 AM',
       },
       {
         id: 'invoice-sent',
@@ -103,7 +103,7 @@ export const story: StoryContent = StorySchema.parse({
     },
     after: {
       title: 'Saturday has three openings left.',
-      line: 'Pick a time — it takes under a minute.',
+      line: 'Pick a time. It takes under a minute.',
       cta: 'Book Saturday',
     },
     metric: { label: 'enquiries this week', from: 2, to: 11 },

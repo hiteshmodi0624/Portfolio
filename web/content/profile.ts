@@ -4,7 +4,7 @@ export const profile: Profile = ProfileSchema.parse({
   name: 'Hitesh Modi',
   siteUrl: 'https://hiteshmodi.in',
   metaDescription:
-    'Beautiful websites and AI helpers that never sleep — built end-to-end by one engineer. A little magic for your business.',
+    'Beautiful websites and AI helpers that never sleep, built end-to-end by one engineer. A little magic for your business.',
   hero: {
     h1: 'A little magic for your business.',
     sub: 'Beautiful websites. AI helpers that never sleep. Built end-to-end by one engineer.',
@@ -15,7 +15,7 @@ export const profile: Profile = ProfileSchema.parse({
     identity: {
       name: 'Hitesh Modi',
       line: 'builds these end-to-end, replies same day',
-      photo: { src: '/images/hitesh-96.jpg', alt: 'Hitesh Modi — portrait' },
+      photo: { src: '/images/hitesh-96.jpg', alt: 'Portrait of Hitesh Modi' },
     },
   },
   finale: {

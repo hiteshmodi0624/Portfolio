@@ -14,7 +14,7 @@ import { ProofSchema, type ProofContent } from './schema'
  */
 export const proof: ProofContent = ProofSchema.parse({
   heading: 'Built before. Shipped before.',
-  lede: 'Real products with real customers — built end-to-end, not mocked up.',
+  lede: 'Real products with real customers, built end-to-end. Every link below is live. Go click around.',
   projects: [
     {
       slug: 'extrack',
@@ -23,17 +23,17 @@ export const proof: ProofContent = ProofSchema.parse({
       outcome: 'From idea to paying customers in 15 days',
       url: 'https://myextrack.com',
       kind: 'product',
-      image: { src: '/shots/extrack.png', width: 1200, height: 750, alt: 'Extrack — live site' },
+      image: { src: '/shots/extrack.png', width: 1200, height: 750, alt: 'The Extrack website, live' },
       logo: { src: '/logos/extrack.png', alt: 'Extrack logo' },
     },
     {
       slug: 'whycosmos',
       name: 'WhyCosmos',
       tagline: 'A learning platform built around curiosity',
-      outcome: 'Lessons, progress, and payments — one place',
+      outcome: 'Lessons, progress, and payments in one place',
       url: 'https://whycosmos.com',
       kind: 'product',
-      image: { src: '/shots/whycosmos.png', width: 1200, height: 750, alt: 'WhyCosmos — live site' },
+      image: { src: '/shots/whycosmos.png', width: 1200, height: 750, alt: 'The WhyCosmos website, live' },
       logo: { src: '/logos/whycosmos.png', alt: 'WhyCosmos logo' },
     },
     {
@@ -43,7 +43,7 @@ export const proof: ProofContent = ProofSchema.parse({
       outcome: 'Spots trouble before customers ever notice',
       url: 'https://myquri.com',
       kind: 'product',
-      image: { src: '/shots/quri.png', width: 1200, height: 750, alt: 'quri — live site' },
+      image: { src: '/shots/quri.png', width: 1200, height: 750, alt: 'The quri website, live' },
       logo: { src: '/logos/quri.png', alt: 'quri logo' },
     },
     {
@@ -53,17 +53,17 @@ export const proof: ProofContent = ProofSchema.parse({
       outcome: 'Invoices for business customers, sent and settled on time',
       url: 'https://www.safewash.co.in',
       kind: 'product',
-      image: { src: '/shots/safewash.png', width: 1200, height: 750, alt: 'Safewash — live site' },
+      image: { src: '/shots/safewash.png', width: 1200, height: 750, alt: 'The Safewash website, live' },
       logo: { src: '/logos/safewash.png', alt: 'Safewash logo' },
     },
     {
       slug: 'ditch-navigation',
       name: 'Ditch Navigation',
       tagline: 'Helps mariners find safe water',
-      outcome: 'Client work in the US — where the 1M+ requests a day come from',
+      outcome: 'Client work in the US. Where the 1M+ requests a day come from.',
       url: 'https://www.ditchnavigation.com',
       kind: 'client',
-      image: { src: '/shots/ditch-navigation.png', width: 1200, height: 750, alt: 'Ditch Navigation — live site' },
+      image: { src: '/shots/ditch-navigation.png', width: 1200, height: 750, alt: 'The Ditch Navigation website, live' },
       logo: { src: '/logos/ditch-navigation.png', alt: 'Ditch Navigation logo' },
     },
     {
@@ -85,7 +85,7 @@ export const proof: ProofContent = ProofSchema.parse({
       outcome: 'Client work, shipped and maintained',
       url: 'https://www.fidusglobal.in',
       kind: 'client',
-      image: { src: '/shots/fidus-global.png', width: 1200, height: 750, alt: 'Fidus Global — live site' },
+      image: { src: '/shots/fidus-global.png', width: 1200, height: 750, alt: 'The Fidus Global website, live' },
       logo: { src: '/logos/fidus-global.png', alt: 'Fidus Global logo' },
     },
     {
@@ -95,7 +95,7 @@ export const proof: ProofContent = ProofSchema.parse({
       outcome: 'Heavy compliance admin, handled quietly',
       url: 'https://www.rtopilot.com.au',
       kind: 'client',
-      image: { src: '/shots/rtopilot.png', width: 1200, height: 750, alt: 'RTOPilot — live site' },
+      image: { src: '/shots/rtopilot.png', width: 1200, height: 750, alt: 'The RTOPilot website, live' },
       logo: { src: '/logos/rtopilot.png', alt: 'RTOPilot logo' },
     },
   ],

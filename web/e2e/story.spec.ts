@@ -121,7 +121,7 @@ test.describe('natural scroll (P3.1) — no pinning, time-driven scenes', () => 
       // last-ish card of the ~1.5s tumble choreography
       label: 'The chaos',
       probe: (section) =>
-        section.getByText('$1,850 — three weeks overdue').locator('xpath=ancestor::li[1]'),
+        section.getByText('$1,850, three weeks overdue').locator('xpath=ancestor::li[1]'),
       timeoutMs: 8_000,
     },
     {

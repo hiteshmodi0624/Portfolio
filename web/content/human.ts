@@ -9,9 +9,9 @@ export const human: HumanContent = HumanSchema.parse({
   heading: 'One engineer, no circus',
   name: 'Hitesh Modi',
   story: [
-    "I'm Hitesh. Every project on this page — design, build, launch — was done by me, start to finish. No agency, no hand-offs, no \"let me check with the team\".",
-    "I build with AI every single day. That's why things that used to take months take me weeks — and why the helpers I build actually work the way the demos promise.",
-    'Clients run my work in Australia, the US, and Southeast Asia. Wherever you are, you get answers the same day — usually within the hour.',
+    "I'm Hitesh. Every project on this page, from design to build to launch, was done by me, start to finish. No agency, no hand-offs, no \"let me check with the team\".",
+    "I build with AI every single day. That's why things that used to take months take me weeks, and why the helpers I build actually work the way the demos promise.",
+    'Clients run my work in Australia, the US, and Southeast Asia. Wherever you are, you get answers the same day, usually within the hour.',
   ],
   nerdyBits: {
     label: 'the nerdy bits',
@@ -24,7 +24,7 @@ export const human: HumanContent = HumanSchema.parse({
   },
   photo: {
     src: '/images/hitesh-640.jpg',
-    alt: 'Hitesh Modi — portrait',
+    alt: 'Portrait of Hitesh Modi',
     width: 640,
     height: 853,
   },

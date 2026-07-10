@@ -86,7 +86,7 @@ describe('Hero', () => {
 
   it('renders the identity chip: 48px photo with real alt + name line (P3.2)', () => {
     render(<Hero hero={profile.hero} />)
-    const img = screen.getByRole('img', { name: 'Hitesh Modi — portrait' })
+    const img = screen.getByRole('img', { name: 'Portrait of Hitesh Modi' })
     expect(img.getAttribute('src')).toBe('/images/hitesh-96.jpg')
     expect(img.getAttribute('width')).toBe('48')
     expect(img.getAttribute('height')).toBe('48')
