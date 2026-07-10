@@ -1,4 +1,4 @@
-import { ServicesSchema, type Service } from './schema'
+import { ServicesIntroSchema, ServicesSchema, type Service, type ServicesIntro } from './schema'
 
 export const services: Service[] = ServicesSchema.parse([
   {
@@ -38,3 +38,9 @@ export const services: Service[] = ServicesSchema.parse([
     ctaLabel: 'Book a call',
   },
 ])
+
+/** Beat 6 section header (P3.3). Plain words, no prices, no jargon. */
+export const servicesIntro: ServicesIntro = ServicesIntroSchema.parse({
+  heading: 'Three ways to start',
+  lede: 'Pick the door that fits. Every one of them ends with something real, live, and working for you.',
+})

@@ -1,3 +1,9 @@
+import { existsSync } from 'node:fs'
+// Node's URL, not the global — jsdom's test environment polyfills `URL`
+// globally and resolves relative bases against http://localhost:3000/,
+// silently discarding a file:// base (import.meta.url) instead of erroring,
+// so `new URL('../../public', import.meta.url)` must use this import.
+import { fileURLToPath, URL as NodeURL } from 'node:url'
 import { describe, expect, it } from 'vitest'
 import {
   ProjectSchema,
@@ -101,6 +107,76 @@ describe('ProjectSchema / ProjectsSchema', () => {
       expect(client.url?.startsWith('https://')).toBe(true)
     }
   })
+
+  const baseProject = {
+    slug: 'extrack',
+    name: 'Extrack',
+    tagline: 't',
+    outcome: 'o',
+    url: 'https://myextrack.com',
+    kind: 'product',
+  }
+
+  it('accepts a project without image/logo (text-only fallback, P3.4)', () => {
+    expect(ProjectSchema.safeParse(baseProject).success).toBe(true)
+  })
+
+  it('accepts a project with image and logo (P3.4)', () => {
+    const withAssets = {
+      ...baseProject,
+      image: { src: '/shots/extrack.png', width: 1200, height: 750, alt: 'Extrack — live site' },
+      logo: { src: '/logos/extrack.png', alt: 'Extrack logo' },
+    }
+    expect(ProjectSchema.safeParse(withAssets).success).toBe(true)
+  })
+
+  it('rejects an image outside /shots/ or without dimensions', () => {
+    expect(
+      ProjectSchema.safeParse({
+        ...baseProject,
+        image: { src: 'https://cdn.example.com/x.png', width: 1200, height: 750, alt: 'x' },
+      }).success,
+    ).toBe(false)
+    expect(
+      ProjectSchema.safeParse({
+        ...baseProject,
+        image: { src: '/shots/extrack.png', alt: 'x' },
+      }).success,
+    ).toBe(false)
+  })
+
+  it('rejects a logo outside /logos/ or without alt', () => {
+    expect(
+      ProjectSchema.safeParse({
+        ...baseProject,
+        logo: { src: '/images/extrack.png', alt: 'Extrack logo' },
+      }).success,
+    ).toBe(false)
+    expect(
+      ProjectSchema.safeParse({
+        ...baseProject,
+        logo: { src: '/logos/extrack.png', alt: '' },
+      }).success,
+    ).toBe(false)
+  })
+
+  it('rejects an image with a valid path but unsupported extension', () => {
+    expect(
+      ProjectSchema.safeParse({
+        ...baseProject,
+        image: { src: '/shots/extrack.gif', width: 1200, height: 800, alt: 'Extrack dashboard' },
+      }).success,
+    ).toBe(false)
+  })
+
+  it('rejects a logo with a valid path but unsupported extension', () => {
+    expect(
+      ProjectSchema.safeParse({
+        ...baseProject,
+        logo: { src: '/logos/extrack.jpg', alt: 'Extrack logo' },
+      }).success,
+    ).toBe(false)
+  })
 })
 
 describe('shipped story content', () => {
@@ -146,7 +222,31 @@ describe('shipped story content', () => {
     expect(proof.projects.find((project) => project.slug === 'quri')?.url).toBe(
       'https://myquri.com',
     )
-    // Safewash is real work with no public site — the only card without a link
-    expect(proof.projects.filter((project) => project.url === undefined)).toHaveLength(1)
+    // Safewash's public site went live 2026-07 (spec P3 §1) — every card links out now
+    expect(proof.projects.find((project) => project.slug === 'safewash')?.url).toBe(
+      'https://www.safewash.co.in',
+    )
+    expect(proof.projects.filter((project) => project.url === undefined)).toHaveLength(0)
+  })
+})
+
+describe('gallery assets (P3.4)', () => {
+  it('at least one shipped project carries a screenshot and a logo', () => {
+    expect(proof.projects.some((project) => project.image !== undefined)).toBe(true)
+    expect(proof.projects.some((project) => project.logo !== undefined)).toBe(true)
+  })
+
+  it('every referenced asset is committed and matches its slug', () => {
+    const publicDir = fileURLToPath(new NodeURL('../../public', import.meta.url))
+    for (const project of proof.projects) {
+      if (project.image) {
+        expect(project.image.src).toBe(`/shots/${project.slug}.png`)
+        expect(existsSync(`${publicDir}${project.image.src}`)).toBe(true)
+      }
+      if (project.logo) {
+        expect(project.logo.src).toBe(`/logos/${project.slug}.png`)
+        expect(existsSync(`${publicDir}${project.logo.src}`)).toBe(true)
+      }
+    }
   })
 })

@@ -1,9 +1,13 @@
-import { render, screen } from '@testing-library/react'
-import { describe, expect, it } from 'vitest'
-import { Turn } from '../../components/beats/turn'
+import { act, render, screen } from '@testing-library/react'
+import { describe, expect, it, vi } from 'vitest'
+import { Turn, TypedText } from '../../components/beats/turn'
 import { story } from '../../content/story'
+import { setViewportWide } from '../setup'
 
-// jsdom = static fallback path (see chaos.test.tsx for the rationale).
+// P3.1: Turn is a normal-flow section on every viewport — no ScrollScene.
+// jsdom's IntersectionObserver stub never fires, so `play` stays false and
+// bubbles hold their whileInView "hidden" state; copy is still in the DOM
+// (typed bubbles always carry an sr-only full-sentence copy).
 describe('Turn (beat 3)', () => {
   const renderTurn = () => render(<Turn turn={story.turn} cards={story.chaos.cards} />)
 
@@ -40,5 +44,88 @@ describe('Turn (beat 3)', () => {
   it('renders the closer line', () => {
     renderTurn()
     expect(screen.getByText('You find out over coffee. Everything just… happened.')).toBeDefined()
+  })
+})
+
+describe('Turn — never pins (P3.1)', () => {
+  it('wide viewports get the same normal-flow section', async () => {
+    setViewportWide(true)
+    const { container } = render(<Turn turn={story.turn} cards={story.chaos.cards} />)
+    await act(async () => {})
+    const section = container.querySelector('section[aria-label="The turn"]') as HTMLElement
+    expect(section.querySelector('.sticky')).toBeNull()
+    expect(section.style.height).toBe('')
+  })
+})
+
+describe('TypedText (P3.1 — timer-driven)', () => {
+  const visibleText = (container: HTMLElement) =>
+    (container.querySelector('span[aria-hidden="true"]') as HTMLElement).textContent
+
+  it('types the full string over time once play is true', () => {
+    vi.useFakeTimers()
+    try {
+      const { container } = render(
+        <TypedText text="Hello there" play reducedMotion={false} startDelayMs={100} msPerChar={20} />,
+      )
+      expect(visibleText(container)).toBe('')
+      // mid-flight: delay (100ms) + 3 chars x 20ms
+      act(() => {
+        vi.advanceTimersByTime(160)
+      })
+      expect(visibleText(container)).toBe('Hel')
+      // completion: the remaining 8 chars + slack
+      act(() => {
+        vi.advanceTimersByTime(20 * 8 + 40)
+      })
+      expect(visibleText(container)).toBe('Hello there')
+    } finally {
+      vi.useRealTimers()
+    }
+  })
+
+  it('clears its interval once typing completes — no zombie timers', () => {
+    vi.useFakeTimers()
+    try {
+      const { container } = render(
+        <TypedText text="Hi" play reducedMotion={false} startDelayMs={0} msPerChar={20} />,
+      )
+      // start delay + both chars + generous slack past completion
+      act(() => {
+        vi.advanceTimersByTime(20 * 2 + 200)
+      })
+      expect(visibleText(container)).toBe('Hi')
+      // typing is done: nothing may still be ticking (a leaked setInterval
+      // would keep dispatching a no-op state-setter every msPerChar forever)
+      expect(vi.getTimerCount()).toBe(0)
+    } finally {
+      vi.useRealTimers()
+    }
+  })
+
+  it('does not type before play flips true', () => {
+    vi.useFakeTimers()
+    try {
+      const { container } = render(
+        <TypedText text="Hello there" play={false} reducedMotion={false} msPerChar={20} />,
+      )
+      act(() => {
+        vi.advanceTimersByTime(2000)
+      })
+      expect(visibleText(container)).toBe('')
+    } finally {
+      vi.useRealTimers()
+    }
+  })
+
+  it('renders the full string immediately under reduced motion', () => {
+    const { container } = render(<TypedText text="Hello there" play reducedMotion />)
+    expect(visibleText(container)).toBe('Hello there')
+  })
+
+  it('always keeps a screen-reader copy of the full sentence', () => {
+    render(<TypedText text="Hello there" play={false} reducedMotion={false} />)
+    const srCopy = screen.getByText('Hello there')
+    expect(srCopy.className).toContain('sr-only')
   })
 })

@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 36 36" fill="none" role="img" aria-label="Extrack">
+  <title>Extrack</title>
+  <defs>
+    <linearGradient id="extrackMarkAmber" x1="6" y1="6" x2="32" y2="32" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#fbbf24" />
+      <stop offset="1" stop-color="#d97706" />
+    </linearGradient>
+  </defs>
+  <rect width="36" height="36" rx="8" fill="url(#extrackMarkAmber)" />
+  <path
+    fill="#09090b"
+    d="M11 9.5V26.5h14.5v-3.3H14.8v-4.7h7.7v-3.3h-7.7v-2.4h10.7v-3.3H11z"
+  />
+</svg>

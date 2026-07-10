@@ -7,6 +7,7 @@
     "prebuild": "node --experimental-strip-types scripts/fetch-stats.ts || echo 'fetch-stats: skipped on this Node - using committed content/stats.json'",
     "build": "next build",
     "budget": "node scripts/measure-bundle.mjs",
+    "capture:shots": "node --experimental-strip-types scripts/capture-shots.ts",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
     "test:unit": "vitest run",

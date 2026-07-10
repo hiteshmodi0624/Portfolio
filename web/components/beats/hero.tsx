@@ -53,6 +53,25 @@ export function Hero({ hero }: HeroProps) {
 
       <p className="mt-6 max-w-xl text-lg text-muted">{hero.sub}</p>
 
+      <div className="mt-6 flex items-center gap-3">
+        {/* eslint-disable-next-line @next/next/no-img-element -- static export
+            serves the committed, pre-sized chip; next/image adds runtime for
+            no benefit with images.unoptimized */}
+        <img
+          src={hero.identity.photo.src}
+          alt={hero.identity.photo.alt}
+          width={48}
+          height={48}
+          loading="eager"
+          className="h-12 w-12 rounded-full border border-white/70 object-cover shadow-sm"
+        />
+        <p className="text-sm text-muted">
+          <strong className="font-semibold text-ink">{hero.identity.name}</strong>
+          {' · '}
+          {hero.identity.line}
+        </p>
+      </div>
+
       <a
         href={hero.ctaHref}
         className="mt-10 rounded-full bg-violet px-8 py-4 text-xl font-bold text-white shadow-lg shadow-violet/25 transition hover:bg-violet/90"

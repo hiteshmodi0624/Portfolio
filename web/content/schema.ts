@@ -5,6 +5,9 @@ const httpsUrl = z
   .url()
   .refine((value) => value.startsWith('https://'), { message: 'outbound links must be https' })
 
+/** Committed, EXIF-stripped asset under public/images/. Shared validator for HeroContentSchema identity photo and HumanSchema photo. */
+const imageSrc = z.string().regex(/^\/images\/[a-z0-9.-]+\.(jpg|jpeg|png|webp)$/)
+
 export const HeroContentSchema = z.object({
   h1: z.string().min(1),
   sub: z.string().min(1),
@@ -13,6 +16,16 @@ export const HeroContentSchema = z.object({
   /** In-page anchor the CTA and scroll cue jump to, e.g. "#finale". */
   ctaHref: z.string().regex(/^#[a-z][a-z-]*$/),
   scrollCue: z.string().min(1),
+  /** P3.2 hero identity: photo chip + name line under the subhead. */
+  identity: z.object({
+    name: z.string().min(1),
+    line: z.string().min(1),
+    photo: z.object({
+      /** Committed, EXIF-stripped asset under public/images/ (never the original). */
+      src: imageSrc,
+      alt: z.string().min(1),
+    }),
+  }),
 })
 
 export const FinaleContentSchema = z.object({
@@ -40,6 +53,34 @@ export const ServiceSchema = z.object({
 })
 
 export const ServicesSchema = z.array(ServiceSchema).min(1)
+
+/** P3.3: the services section's own copy — components never hardcode prose. */
+export const ServicesIntroSchema = z.object({
+  heading: z.string().min(1),
+  lede: z.string().min(1),
+})
+
+/* ——— P3.2: beat 7 — the human (spec §3.4) ——— */
+
+export const HumanSchema = z.object({
+  heading: z.string().min(1),
+  name: z.string().min(1),
+  /** Short story paragraphs — plain words; the tech vocabulary lives in nerdyBits. */
+  story: z.array(z.string().min(1)).min(2),
+  /** Collapsed-by-default disclosure rendered as a native <details>. */
+  nerdyBits: z.object({
+    label: z.string().min(1),
+    items: z.array(z.string().min(1)).min(1),
+  }),
+  photo: z.object({
+    /** Committed, EXIF-stripped asset under public/images/ (never the original). */
+    src: imageSrc,
+    alt: z.string().min(1),
+    /** Intrinsic pixel dimensions — rendered as width/height attrs (no CLS). */
+    width: z.number().int().positive(),
+    height: z.number().int().positive(),
+  }),
+})
 
 /* ——— P2: story beats 2–4 (spec §3) ——— */
 
@@ -113,6 +154,23 @@ export const ProjectSchema = z.object({
    * mechanism, in use since 2026-07-10) — append new client sites to
    * content/projects.ts as they go live; no component changes needed. */
   kind: z.enum(['product', 'client']),
+  /** P3.4: committed screenshot from scripts/capture-shots.ts. Optional —
+   * a card without one renders text-only. Explicit dimensions = no CLS. */
+  image: z
+    .object({
+      src: z.string().regex(/^\/shots\/[a-z0-9-]+\.(png|webp)$/),
+      width: z.number().int().positive(),
+      height: z.number().int().positive(),
+      alt: z.string().min(1),
+    })
+    .optional(),
+  /** P3.4: committed favicon chip. Optional — omitted when unusable (spec §7). */
+  logo: z
+    .object({
+      src: z.string().regex(/^\/logos\/[a-z0-9-]+\.(png|webp)$/),
+      alt: z.string().min(1),
+    })
+    .optional(),
 })
 
 export const ProjectsSchema = z.array(ProjectSchema).min(1)
@@ -156,6 +214,8 @@ export type HeroContent = z.infer<typeof HeroContentSchema>
 export type FinaleContent = z.infer<typeof FinaleContentSchema>
 export type Profile = z.infer<typeof ProfileSchema>
 export type Service = z.infer<typeof ServiceSchema>
+export type ServicesIntro = z.infer<typeof ServicesIntroSchema>
+export type HumanContent = z.infer<typeof HumanSchema>
 export type StoryContent = z.infer<typeof StorySchema>
 export type Project = z.infer<typeof ProjectSchema>
 export type ProofContent = z.infer<typeof ProofSchema>

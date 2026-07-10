@@ -12,7 +12,8 @@ export function setPrefersReducedMotion(value: boolean): void {
   reducedMotion = value
 }
 
-/** Toggle the simulated `(min-width: 768px)` query — ScrollScene's scrub gate. */
+/** Toggle the simulated `(min-width: 768px)` query — Proof's parallax gate
+ * and the beats' never-pins regression tests (P3.1). */
 export function setViewportWide(value: boolean): void {
   wideViewport = value
 }

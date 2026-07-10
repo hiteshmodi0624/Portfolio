@@ -27,7 +27,9 @@ test.describe('finale (beat 8)', () => {
     await page.goto('/')
     const mail = page.getByRole('link', { name: 'mail@hiteshmodi.in' })
     await expect(mail).toHaveAttribute('href', 'mailto:mail@hiteshmodi.in')
-    const cal = page.getByRole('link', { name: 'Book a call' })
+    // scoped to #finale — the services doors (P3.3) also render a "Book a
+    // call" CTA (to #finale), so the unscoped role query is ambiguous now.
+    const cal = page.locator('#finale').getByRole('link', { name: 'Book a call' })
     await expect(cal).toHaveAttribute('href', 'https://cal.com/hiteshmodi')
     await expect(page.locator('#finale').getByRole('heading', { level: 2 })).toContainText(
       "Let's build your magic",
@@ -101,7 +103,8 @@ test.describe('prefers-reduced-motion', () => {
     await page.locator('#finale').scrollIntoViewIfNeeded()
 
     const heading = page.locator('#finale').getByRole('heading', { level: 2 })
-    const cta = page.getByRole('link', { name: 'Book a call' })
+    // scoped to #finale — see the same-named note above.
+    const cta = page.locator('#finale').getByRole('link', { name: 'Book a call' })
     await expect(heading).toBeVisible()
     await expect(cta).toBeVisible()
 
@@ -166,5 +169,18 @@ test.describe('hero entrance animation (normal motion)', () => {
       .first()
       .evaluate((el) => getComputedStyle(el).transform)
     expect(firstWordTransform).toBe('none')
+  })
+})
+
+test.describe('hero identity (P3.2)', () => {
+  test('renders the name line and a photo chip with non-empty alt', async ({ page }) => {
+    await page.goto('/')
+    const hero = page.locator('section[aria-label="Intro"]')
+    await expect(hero.getByText('Hitesh Modi', { exact: true })).toBeVisible()
+    await expect(hero.getByText(/builds these end-to-end, replies same day/)).toBeVisible()
+    const img = hero.locator('img')
+    await expect(img).toBeVisible()
+    const alt = await img.getAttribute('alt')
+    expect(alt !== null && alt.length > 0).toBe(true)
   })
 })
