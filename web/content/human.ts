@@ -40,6 +40,6 @@ export const human: HumanContent = HumanSchema.parse({
     src: '/images/hitesh-crop-640.jpg',
     alt: 'Portrait of Hitesh Modi',
     width: 640,
-    height: 660,
+    height: 575,
   },
 })
