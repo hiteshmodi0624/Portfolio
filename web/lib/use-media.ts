@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react'
 /**
  * SSR-safe media query. Returns false on the server and on the first client
  * render (so static-export HTML and hydration always match), then tracks the
- * live media query. Used by ScrollScene (scrub gate) and Proof (parallax gate).
+ * live media query. Used by Proof (parallax gate) and beats' reduced-motion tests.
  */
 export function useMediaQuery(query: string): boolean {
   const [matches, setMatches] = useState(false)
