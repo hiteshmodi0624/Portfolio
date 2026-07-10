@@ -78,14 +78,24 @@ export const HumanSchema = z.object({
   name: z.string().min(1),
   /** Short story paragraphs — plain words; the tech vocabulary lives in nerdyBits. */
   story: z.array(z.string().min(1)).min(2),
-  /** Collapsed-by-default disclosure rendered as a native <details>. */
+  /** Native <details> disclosure — open by default (PDF page 9 .nerdy dark
+   * panel), still collapsible. */
   nerdyBits: z.object({
     label: z.string().min(1),
     items: z.array(z.string().min(1)).min(1),
   }),
   /** Content refresh P3: quick-facts cards under the photo (PDF page 9
-   * .fact treatment — mono micro-label + plain body). */
-  facts: z.array(z.object({ label: z.string().min(1), body: z.string().min(1) })).min(1),
+   * .fact treatment — mono micro-label + plain body). A fact may carry one
+   * outbound https link rendered under its body (e.g. the chess profile). */
+  facts: z
+    .array(
+      z.object({
+        label: z.string().min(1),
+        body: z.string().min(1),
+        link: z.object({ label: z.string().min(1), href: httpsUrl }).optional(),
+      }),
+    )
+    .min(1),
   photo: z.object({
     /** Committed, EXIF-stripped asset under public/images/ (never the original). */
     src: imageSrc,

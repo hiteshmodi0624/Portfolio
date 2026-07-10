@@ -3,7 +3,8 @@ import { HumanSchema, type HumanContent } from './schema'
 /**
  * Beat 7 — "One engineer, no circus" (spec §3.4). The person behind every
  * other beat. Story stays plain-spoken; the tech vocabulary is deliberately
- * quarantined in nerdyBits (rendered inside a collapsed <details>).
+ * quarantined in nerdyBits (a native <details> dark panel, open by default
+ * but still collapsible — PDF page 9 .nerdy treatment).
  */
 export const human: HumanContent = HumanSchema.parse({
   heading: 'One engineer, no circus',
@@ -14,7 +15,7 @@ export const human: HumanContent = HumanSchema.parse({
     'Clients run my work in Australia, the US, and Southeast Asia. Wherever you are, you get answers the same day, usually within the hour.',
   ],
   nerdyBits: {
-    label: 'the nerdy bits',
+    label: 'the nerdy bits, for your technical friend',
     items: [
       'AWS end-to-end: CDK-defined infrastructure, S3 + CloudFront, Lambda, SES',
       'AI agent infrastructure: MCP servers, tool-calling pipelines, eval harnesses',
@@ -34,6 +35,10 @@ export const human: HumanContent = HumanSchema.parse({
     {
       label: 'Off hours',
       body: 'Chess, mostly. And competitive programming: ranked 1559 in the world at Google Kickstart.',
+      link: {
+        label: 'chess.com/hiteshmodi0624',
+        href: 'https://www.chess.com/member/hiteshmodi0624',
+      },
     },
   ],
   photo: {

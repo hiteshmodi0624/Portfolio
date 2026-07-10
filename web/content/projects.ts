@@ -73,10 +73,15 @@ export const proof: ProofContent = ProofSchema.parse({
       outcome: 'Taken from first sketch to live site',
       url: 'https://www.aimersinternational.com',
       kind: 'client',
-      // capture-shots skipped this site (favicon fetch threw — "Request
-      // path contains unescaped characters"), so the script's own
-      // text-only-fallback rule applies here: no image/logo block, even
-      // though the screenshot itself rendered cleanly before the throw.
+      // Screenshot is the approved pdf-portfolio capture (resized to the
+      // gallery's 1200x750). Only the logo chip stays omitted: the favicon
+      // fetch still throws ("Request path contains unescaped characters").
+      image: {
+        src: '/shots/aimers-international.png',
+        width: 1200,
+        height: 750,
+        alt: 'The Aimers International website, live',
+      },
     },
     {
       slug: 'fidus-global',

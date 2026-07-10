@@ -11,9 +11,10 @@ export interface HumanProps {
 
 /** Beat 7 — "One engineer, no circus" (spec §3.4). The person behind every
  * other beat: tilted glass-framed photo, a short plain-words story, and the
- * tech vocabulary tucked into a native <details> (keyboard + screen-reader
- * accessible for free — no JS disclosure widget). Reduced motion is handled
- * by the page-level MotionConfig (fade only, no movement). */
+ * tech vocabulary in a native <details> dark panel — open by default, still
+ * collapsible, keyboard + screen-reader accessible for free (no JS
+ * disclosure widget). Reduced motion is handled by the page-level
+ * MotionConfig (fade only, no movement). */
 export function Human({ human }: HumanProps) {
   return (
     <section aria-label="The human" className="relative overflow-x-clip">
@@ -47,7 +48,22 @@ export function Human({ human }: HumanProps) {
                 <dt className="font-mono text-[11px] font-semibold uppercase tracking-[0.14em] text-violet">
                   {fact.label}
                 </dt>
-                <dd className="mt-1 text-sm leading-relaxed text-muted">{fact.body}</dd>
+                <dd className="mt-1 text-sm leading-relaxed text-muted">
+                  {fact.body}
+                  {fact.link ? (
+                    /* #7C5CFF violet misses WCAG 4.5:1 at small mono size on
+                       the glass card; #6741D9 is the branch-established
+                       darker step (see proof.tsx url pill / cases.tsx). */
+                    <a
+                      href={fact.link.href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="mt-1.5 block font-mono text-xs font-semibold text-[#6741D9] transition hover:text-ink"
+                    >
+                      {fact.link.label} ↗
+                    </a>
+                  ) : null}
+                </dd>
               </GlassCard>
             ))}
           </dl>
@@ -71,11 +87,14 @@ export function Human({ human }: HumanProps) {
             </motion.p>
           ))}
           <motion.div variants={fadeRise} className="mt-8">
-            <details className="rounded-2xl border border-white/60 bg-white/70 p-4 shadow-lg shadow-ink/5 backdrop-blur">
-              <summary className="cursor-pointer font-mono text-sm text-muted transition hover:text-ink">
+            {/* PDF page 9 .nerdy treatment: ink panel, blush mono uppercase
+                label, light-lavender (#C9C4E4) mono items. Open by default —
+                the native <details> keeps it collapsible for free. */}
+            <details open className="rounded-2xl bg-ink p-5 shadow-lg shadow-ink/20">
+              <summary className="cursor-pointer font-mono text-xs font-semibold uppercase tracking-[0.16em] text-blush transition hover:text-white">
                 {human.nerdyBits.label}
               </summary>
-              <ul className="mt-3 list-disc space-y-2 pl-5 text-sm text-muted">
+              <ul className="mt-3 list-disc space-y-2 pl-5 font-mono text-xs leading-relaxed text-[#C9C4E4]">
                 {human.nerdyBits.items.map((item) => (
                   <li key={item}>{item}</li>
                 ))}

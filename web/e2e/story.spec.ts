@@ -268,7 +268,9 @@ test.describe('mobile-light (375px)', () => {
 })
 
 test.describe('human (beat 7, P3.2)', () => {
-  test('renders heading, photo, and an openable nerdy-bits disclosure', async ({ page }) => {
+  test('renders heading, photo, and an open-by-default, collapsible nerdy-bits panel', async ({
+    page,
+  }) => {
     await page.goto('/')
     const section = page.locator('section[aria-label="The human"]')
     await section.scrollIntoViewIfNeeded()
@@ -276,11 +278,12 @@ test.describe('human (beat 7, P3.2)', () => {
     const photo = section.locator('img')
     await expect(photo).toBeVisible()
     await expect(photo).toHaveAttribute('alt', /.+/)
+    // nerdy bits: open by default (dark panel), still a native collapsible
     const details = section.locator('details')
-    await expect(details).not.toHaveAttribute('open')
-    await section.locator('summary').click()
     await expect(details).toHaveAttribute('open', '')
     await expect(section.getByText(/MCP servers/)).toBeVisible()
+    await section.locator('summary').click()
+    await expect(details).not.toHaveAttribute('open')
   })
 })
 
