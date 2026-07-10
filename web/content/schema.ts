@@ -123,6 +123,35 @@ export const ProofSchema = z.object({
   projects: ProjectsSchema,
 })
 
+/* ——— P2: build-time stats (spec §4) ——— */
+
+export const StatsSchema = z.object({
+  updatedAt: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+  /** User-owned business results — scripts/fetch-stats.ts never touches these. */
+  manual: z.object({
+    daysToFirstPayingCustomer: z.number().int().positive(),
+    requestsPerDay: z.number().int().positive(),
+    clientCountries: z.number().int().positive(),
+  }),
+  /** Refreshed pre-build by scripts/fetch-stats.ts when a token is available.
+   * Not displayed in P2; P4's MCP server / llms.txt read the same module. */
+  github: z.object({
+    publicRepos: z.number().int().nonnegative(),
+    contributionsPastYear: z.number().int().nonnegative(),
+  }),
+})
+
+export const TickerItemSchema = z.object({
+  id: z.string().regex(/^[a-z][a-z0-9-]*$/),
+  value: z.number().int().positive(),
+  notation: z.enum(['plain', 'compact']),
+  suffix: z.string(),
+  label: z.string().min(1),
+})
+
+/** Exactly the three spec §3 results: 15 days · 1M+/day · 4 countries. */
+export const TickerSchema = z.array(TickerItemSchema).length(3)
+
 export type HeroContent = z.infer<typeof HeroContentSchema>
 export type FinaleContent = z.infer<typeof FinaleContentSchema>
 export type Profile = z.infer<typeof ProfileSchema>
@@ -130,3 +159,5 @@ export type Service = z.infer<typeof ServiceSchema>
 export type StoryContent = z.infer<typeof StorySchema>
 export type Project = z.infer<typeof ProjectSchema>
 export type ProofContent = z.infer<typeof ProofSchema>
+export type Stats = z.infer<typeof StatsSchema>
+export type TickerItem = z.infer<typeof TickerItemSchema>

@@ -1,0 +1,12 @@
+{
+  "updatedAt": "2026-07-10",
+  "manual": {
+    "daysToFirstPayingCustomer": 15,
+    "requestsPerDay": 1000000,
+    "clientCountries": 4
+  },
+  "github": {
+    "publicRepos": 20,
+    "contributionsPastYear": 1500
+  }
+}
