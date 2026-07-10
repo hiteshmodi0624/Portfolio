@@ -14,7 +14,7 @@ const validProfile = {
     availability: 'Available for new projects',
     ctaLabel: 'Start your project',
     ctaHref: '#finale',
-    scrollCue: 'show me how ↓',
+    secondaryCta: { label: 'See the work ↓', href: '#work' },
     identity: {
       name: 'Hitesh Modi',
       line: 'builds these end-to-end, replies same day',
@@ -47,6 +47,30 @@ describe('ProfileSchema', () => {
     const bad = {
       ...validProfile,
       finale: { ...validProfile.finale, calUrl: 'http://cal.com/hiteshmodi' },
+    }
+    expect(ProfileSchema.safeParse(bad).success).toBe(false)
+  })
+
+  it('rejects a hero without a secondary CTA (P4 hero redesign)', () => {
+    const { secondaryCta: _secondaryCta, ...heroRest } = validProfile.hero
+    const bad = { ...validProfile, hero: heroRest }
+    expect(ProfileSchema.safeParse(bad).success).toBe(false)
+  })
+
+  it('rejects a secondary CTA whose href is not an in-page anchor', () => {
+    for (const href of ['https://example.com', '#Work', 'work', '#work2']) {
+      const bad = {
+        ...validProfile,
+        hero: { ...validProfile.hero, secondaryCta: { label: 'See the work ↓', href } },
+      }
+      expect(ProfileSchema.safeParse(bad).success).toBe(false)
+    }
+  })
+
+  it('rejects a secondary CTA with an empty label', () => {
+    const bad = {
+      ...validProfile,
+      hero: { ...validProfile.hero, secondaryCta: { label: '', href: '#work' } },
     }
     expect(ProfileSchema.safeParse(bad).success).toBe(false)
   })
@@ -97,6 +121,13 @@ describe('ServicesSchema', () => {
     ]
     expect(ServicesSchema.safeParse(bad).success).toBe(false)
   })
+
+  it('rejects a service without a fit line', () => {
+    const bad = [
+      { slug: 'x', title: 'X', hook: 'x', deliverables: ['a'], timeline: 'x', ctaLabel: 'x' },
+    ]
+    expect(ServicesSchema.safeParse(bad).success).toBe(false)
+  })
 })
 
 describe('shipped content', () => {
@@ -106,7 +137,8 @@ describe('shipped content', () => {
       'Beautiful websites. AI helpers that never sleep. Built end-to-end by one engineer.',
     )
     expect(profile.hero.ctaLabel).toBe('Start your project')
-    expect(profile.hero.scrollCue).toBe('show me how ↓')
+    expect(profile.hero.secondaryCta.label).toBe('See the work ↓')
+    expect(profile.hero.secondaryCta.href).toBe('#work')
     expect(profile.finale.heading).toBe("Let's build your magic")
     expect(profile.finale.email).toBe('mail@hiteshmodi.in')
     expect(profile.finale.calUrl).toBe('https://cal.com/hiteshmodi')

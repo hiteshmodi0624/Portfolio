@@ -35,7 +35,7 @@ export function Finale({ finale }: FinaleProps) {
           {finale.heading}
         </h2>
         <p className="mt-4 max-w-md text-muted">
-          Tell me what&apos;s eating your week. I&apos;ll tell you what we can automate — and what
+          Tell me what&apos;s eating your week. I&apos;ll tell you what we can automate, and what
           your website could be doing for you.
         </p>
         <div className="mt-10 flex flex-col items-center gap-4 sm:flex-row">

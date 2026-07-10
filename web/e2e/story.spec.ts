@@ -10,8 +10,10 @@ const BEATS = [
 /** Desktop page-height budget in viewport-heights (spec §6 P3.1). The old
  * pinned page ran ~13 viewports of runway; unpinning drops it below 8.
  * Raised by ~1 per NEW CONTENT SECTION as P3.2 (human) and P3.3 (services)
- * land — the budget guards against pinned emptiness, not against content. */
-const MAX_PAGE_VIEWPORTS = 10
+ * land — the budget guards against pinned emptiness, not against content.
+ * Content refresh P2 adds the case-studies beat: four full case layouts,
+ * roughly one viewport each on desktop, hence +4. */
+const MAX_PAGE_VIEWPORTS = 14
 
 /** Scroll a section's top to the viewport top, instantly (the site sets
  * scroll-behavior: smooth; tests must not animate there), ONCE — the
@@ -35,6 +37,7 @@ test.describe('story beats 2–5 (content)', () => {
       'The chaos',
       'The turn',
       'The storefront',
+      'Case studies',
       'Proof',
       'Services',
       'The human',
@@ -42,7 +45,7 @@ test.describe('story beats 2–5 (content)', () => {
     ])
   })
 
-  test('proof gallery and results ticker carry the shipped content', async ({ page }) => {
+  test('proof gallery carries the shipped content', async ({ page }) => {
     await page.goto('/')
     const proof = page.locator('section[aria-label="Proof"]')
     await proof.scrollIntoViewIfNeeded()
@@ -75,17 +78,9 @@ test.describe('story beats 2–5 (content)', () => {
     // is a case-insensitive substring match and would also hit the outcome
     // lines that begin with "Client work…")
     await expect(proof.getByText('client work', { exact: true })).toHaveCount(4)
-    // Ticker numbers flow from content/stats.json via the Zod stats module —
-    // CountUp settles on the real values (toHaveText retries through the count-up).
-    await expect(proof.locator('dd').nth(0)).toHaveText('15 days')
-    await expect(proof.locator('dd').nth(1)).toHaveText('1M+')
-    await expect(proof.locator('dd').nth(2)).toHaveText('4')
-    // exact: true — Extrack's own outcome line ("From idea to paying
-    // customers in 15 days") is a case-insensitive substring match for the
-    // ticker's dt label, the same pitfall as "client work" above.
-    await expect(proof.getByText('from idea to paying customers', { exact: true })).toBeVisible()
-    await expect(proof.getByText('requests served every day', { exact: true })).toBeVisible()
-    await expect(proof.getByText('countries where clients run my work', { exact: true })).toBeVisible()
+    // the results ticker moved into the hero's stats shelf (P4) — the proof
+    // beat must not duplicate it (see home.spec.ts for the hero assertions)
+    await expect(proof.locator('dd')).toHaveCount(0)
   })
 })
 
@@ -121,7 +116,7 @@ test.describe('natural scroll (P3.1) — no pinning, time-driven scenes', () => 
       // last-ish card of the ~1.5s tumble choreography
       label: 'The chaos',
       probe: (section) =>
-        section.getByText('$1,850 — three weeks overdue').locator('xpath=ancestor::li[1]'),
+        section.getByText('$1,850, three weeks overdue').locator('xpath=ancestor::li[1]'),
       timeoutMs: 8_000,
     },
     {
@@ -373,37 +368,44 @@ test.describe('proof gallery visuals (P3.4)', () => {
 // in a real browser, instead of in the unit suite.
 // ---------------------------------------------------------------------------
 
-test.describe('proof ticker CountUp — genuine entrance animation (normal motion)', () => {
+test.describe('hero stats shelf CountUp — genuine entrance animation (normal motion)', () => {
   // Verified once, on the project with real mouse/scroll semantics; the
   // component gates only on prefers-reduced-motion, not on viewport width, so
   // one project is sufficient to prove the animation actually runs.
   test.skip(({ isMobile }) => Boolean(isMobile), 'entrance animation is viewport-agnostic; proven once on desktop')
 
   test('speed stat counts up from zero and settles on the module value', async ({ page }) => {
-    await page.goto('/')
-    // Sample the "15 days" stat's textContent across ~90 rAF frames, starting
-    // the instant it scrolls into view (instant scroll — smooth scrolling
-    // would blur the moment CountUp's useInView flips true). The static HTML
-    // already shows the final value before scroll (spec: no-JS visitors read
+    // The shelf sits inside the hero (P4), in view from the first paint on
+    // desktop, so CountUp fires during hydration rather than on scroll.
+    // Sample the "15 days" stat's textContent across rAF frames from the
+    // earliest possible moment (before the page's own scripts run). The
+    // static HTML already shows the final value (spec: no-JS visitors read
     // the real number), so a genuine animation must first dip away from it.
-    const samples = await page.evaluate(() => {
-      const dd = document.querySelectorAll('section[aria-label="Proof"] dl dd')[0] as HTMLElement
-      const collected: string[] = []
-      return new Promise<string[]>((resolve) => {
-        let frame = 0
-        function tick() {
-          collected.push(dd.textContent ?? '')
-          frame += 1
-          if (frame < 90) {
-            requestAnimationFrame(tick)
-          } else {
-            resolve(collected)
-          }
+    await page.addInitScript(() => {
+      const w = window as unknown as { __statSamples: string[] }
+      w.__statSamples = []
+      const record = () => {
+        const dd = document.querySelector('section[aria-label="Intro"] dl dd')
+        if (dd) {
+          w.__statSamples.push(dd.textContent ?? '')
         }
-        requestAnimationFrame(tick)
-        dd.scrollIntoView({ behavior: 'instant', block: 'center' })
-      })
+        if (w.__statSamples.length < 150) {
+          requestAnimationFrame(record)
+        }
+      }
+      requestAnimationFrame(record)
     })
+
+    await page.goto('/')
+    await page.waitForFunction(
+      () =>
+        (window as unknown as { __statSamples: string[] }).__statSamples.length >= 150,
+      undefined,
+      { timeout: 10000 },
+    )
+    const samples = await page.evaluate(
+      () => (window as unknown as { __statSamples: string[] }).__statSamples,
+    )
 
     const finalValue = samples[samples.length - 1]
     expect(finalValue).toBe('15 days')

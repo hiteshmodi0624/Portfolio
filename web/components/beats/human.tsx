@@ -39,6 +39,18 @@ export function Human({ human }: HumanProps) {
               className="h-auto w-full rounded-xl object-cover"
             />
           </GlassCard>
+          {/* PDF page 9 .fact treatment: mono uppercase micro-label in
+              violet over a plain one-line body, one small glass card each. */}
+          <dl className="mt-6 space-y-3">
+            {human.facts.map((fact) => (
+              <GlassCard key={fact.label} className="px-4 py-3">
+                <dt className="font-mono text-[11px] font-semibold uppercase tracking-[0.14em] text-violet">
+                  {fact.label}
+                </dt>
+                <dd className="mt-1 text-sm leading-relaxed text-muted">{fact.body}</dd>
+              </GlassCard>
+            ))}
+          </dl>
         </motion.div>
         <motion.div
           variants={staggerContainer}

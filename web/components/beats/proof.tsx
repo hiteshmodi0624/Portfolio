@@ -2,26 +2,25 @@
 
 import { motion, useReducedMotion, useScroll, useTransform } from 'motion/react'
 import { useRef } from 'react'
-import type { ProofContent, TickerItem } from '@/content/schema'
+import type { ProofContent } from '@/content/schema'
 import { fadeRise, staggerContainer } from '@/lib/motion'
+import { displayHost } from '@/lib/url'
 import { useMediaQuery } from '@/lib/use-media'
-import { CountUp } from '@/components/ui/count-up'
 import { GlassCard } from '@/components/ui/glass-card'
 import { TiltCard } from '@/components/ui/tilt-card'
 
 export interface ProofProps {
   proof: ProofContent
-  ticker: TickerItem[]
 }
 
 /** Lazy scatter angles for the floating gallery. */
 const REST_ROTATIONS = [-2, 1.5, -1, 2.5, -1.5, 1]
 
-/** Beat 5 — "Built before. Shipped before." Floating tilted gallery with a
- * results ticker whose numbers flow from the stats content module. Parallax
+/** Beat 5 — "Built before. Shipped before." Floating tilted gallery (the
+ * results ticker moved into the hero's stats shelf in P4). Parallax
  * and tilt are gated (wide viewport + motion allowed); reduced motion and
  * mobile get the same content with opacity fades only. */
-export function Proof({ proof, ticker }: ProofProps) {
+export function Proof({ proof }: ProofProps) {
   const ref = useRef<HTMLElement | null>(null)
   const prefersReducedMotion = useReducedMotion()
   const isWide = useMediaQuery('(min-width: 768px)')
@@ -86,23 +85,34 @@ export function Proof({ proof, ticker }: ProofProps) {
                         ) : null}
                         <h3 className="font-display text-xl font-semibold text-ink">{project.name}</h3>
                       </div>
-                      {project.kind === 'client' ? (
-                        <span className="rounded-full bg-wash-sky px-2.5 py-0.5 text-xs text-muted">
-                          client work
-                        </span>
-                      ) : null}
+                      {/* every card wears a kind chip, PDF chip palette:
+                          client = sky wash, own product = lavender wash.
+                          Text darkened one step past the PDF for WCAG AA at
+                          12px: #1971C2 on #EEF7FF = 4.63:1, #6741D9 on
+                          #F5F3FF = 5.74:1 (see cases.tsx TONE_CLASSES). */}
+                      <span
+                        className={`shrink-0 whitespace-nowrap rounded-full border px-2.5 py-0.5 text-xs ${
+                          project.kind === 'client'
+                            ? 'border-sky/40 bg-wash-sky text-[#1971C2]'
+                            : 'border-violet/35 bg-wash-lavender text-[#6741D9]'
+                        }`}
+                      >
+                        {project.kind === 'client' ? 'client work' : 'my own product'}
+                      </span>
                     </div>
                     <p className="mt-1 text-sm text-muted">{project.tagline}</p>
                     <p className="mt-4 text-sm font-medium text-ink">{project.outcome}</p>
                     {project.url ? (
-                      <a
-                        href={project.url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="mt-auto pt-4 font-mono text-xs text-muted underline underline-offset-4 transition hover:text-ink"
-                      >
-                        {new URL(project.url).hostname} ↗
-                      </a>
+                      <div className="mt-auto pt-4">
+                        <a
+                          href={project.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-block rounded-full bg-wash-lavender px-3.5 py-1.5 font-mono text-xs font-semibold text-[#6741D9] transition hover:bg-[#6741D9] hover:text-white"
+                        >
+                          {displayHost(project.url)} ↗
+                        </a>
+                      </div>
                     ) : null}
                   </GlassCard>
                 </TiltCard>
@@ -110,18 +120,6 @@ export function Proof({ proof, ticker }: ProofProps) {
             </motion.li>
           ))}
         </motion.ul>
-
-        <dl className="mt-16 grid gap-4 sm:grid-cols-3">
-          {ticker.map((item) => (
-            <GlassCard key={item.id} className="flex flex-col-reverse p-6 text-center">
-              <dt className="mt-1 text-sm text-muted">{item.label}</dt>
-              <dd className="font-display text-4xl font-semibold text-ink">
-                <CountUp to={item.value} notation={item.notation} />
-                {item.suffix}
-              </dd>
-            </GlassCard>
-          ))}
-        </dl>
       </div>
     </section>
   )

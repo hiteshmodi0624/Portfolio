@@ -7,7 +7,13 @@ const validHuman = {
   name: 'Hitesh Modi',
   story: ['First paragraph.', 'Second paragraph.'],
   nerdyBits: { label: 'the nerdy bits', items: ['AWS', 'MCP servers'] },
-  photo: { src: '/images/hitesh-640.jpg', alt: 'Hitesh Modi — portrait', width: 640, height: 853 },
+  facts: [{ label: 'Home base', body: 'Guwahati, India.' }],
+  photo: {
+    src: '/images/hitesh-crop-640.jpg',
+    alt: 'Hitesh Modi — portrait',
+    width: 640,
+    height: 660,
+  },
 }
 
 describe('HumanSchema', () => {
@@ -46,6 +52,15 @@ describe('HumanSchema', () => {
     const bad = { ...validHuman, nerdyBits: { label: 'the nerdy bits', items: [] } }
     expect(HumanSchema.safeParse(bad).success).toBe(false)
   })
+
+  it('rejects an empty facts list', () => {
+    expect(HumanSchema.safeParse({ ...validHuman, facts: [] }).success).toBe(false)
+  })
+
+  it('rejects a fact without a body', () => {
+    const bad = { ...validHuman, facts: [{ label: 'Home base' }] }
+    expect(HumanSchema.safeParse(bad).success).toBe(false)
+  })
 })
 
 describe('shipped human content', () => {
@@ -55,9 +70,17 @@ describe('shipped human content', () => {
     expect(human.story.length).toBeGreaterThanOrEqual(2)
     expect(human.nerdyBits.label).toBe('the nerdy bits')
     expect(human.nerdyBits.items.length).toBeGreaterThanOrEqual(1)
-    expect(human.photo.src).toBe('/images/hitesh-640.jpg')
+    expect(human.photo.src).toBe('/images/hitesh-crop-640.jpg')
     expect(human.photo.width).toBeGreaterThan(0)
     expect(human.photo.height).toBeGreaterThan(0)
+  })
+
+  it('ships the three PDF page 9 fact cards — home base, education, off hours', () => {
+    expect(human.facts).toHaveLength(3)
+    expect(human.facts.map((fact) => fact.label)).toEqual(['Home base', 'Education', 'Off hours'])
+    expect(human.facts[0]?.body).toMatch(/Guwahati/)
+    expect(human.facts[1]?.body).toMatch(/NIT Kurukshetra/)
+    expect(human.facts[2]?.body).toMatch(/Chess/)
   })
 
   it('keeps the story jargon-free — the tech vocabulary lives in nerdyBits only', () => {

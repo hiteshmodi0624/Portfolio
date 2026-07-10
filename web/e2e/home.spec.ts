@@ -5,20 +5,47 @@ import { expect, test } from '@playwright/test'
 const HERO_H1 = 'A little magic for your business.'
 
 test.describe('hero (beat 1)', () => {
-  test('renders H1, availability badge, and CTA', async ({ page }) => {
+  test('renders H1, availability badge, and dual CTAs', async ({ page }) => {
     await page.goto('/')
     await expect(page.getByRole('heading', { level: 1 })).toContainText(HERO_H1)
     await expect(page.getByText('Available for new projects')).toBeVisible()
     const cta = page.getByRole('link', { name: 'Start your project' })
     await expect(cta).toBeVisible()
     await expect(cta).toHaveAttribute('href', '#finale')
-    await expect(page.getByText('show me how ↓')).toBeVisible()
+    const secondary = page.getByRole('link', { name: 'See the work ↓' })
+    await expect(secondary).toBeVisible()
+    await expect(secondary).toHaveAttribute('href', '#work')
   })
 
-  test('CTA scrolls to the finale', async ({ page }) => {
+  test('primary CTA scrolls to the finale', async ({ page }) => {
     await page.goto('/')
     await page.getByRole('link', { name: 'Start your project' }).click()
     await expect(page.locator('#finale')).toBeInViewport()
+  })
+
+  test('secondary CTA scrolls to the case studies', async ({ page }) => {
+    await page.goto('/')
+    await page.getByRole('link', { name: 'See the work ↓' }).click()
+    await expect(page.locator('#work')).toBeInViewport()
+  })
+
+  test('results shelf renders inside the hero with final values', async ({ page }) => {
+    await page.goto('/')
+    const hero = page.locator('section[aria-label="Intro"]')
+    await expect(hero.locator('dd')).toHaveCount(3)
+    await expect(hero.locator('dd').nth(0)).toContainText('15 days')
+    await expect(hero.locator('dd').nth(1)).toContainText('1M+')
+    await expect(hero.locator('dd').nth(2)).toContainText('4')
+    // labels flow from content/ticker.ts (exact: true — Extrack's outcome line
+    // is a case-insensitive substring match for the first label). toBeAttached,
+    // not toBeVisible: on the mobile project the shelf sits below the fold.
+    await expect(hero.getByText('from idea to paying customers', { exact: true })).toBeAttached()
+    await expect(hero.getByText('requests served every day', { exact: true })).toBeAttached()
+    await expect(
+      hero.getByText('countries where clients run my work', { exact: true }),
+    ).toBeAttached()
+    // and it no longer renders in the proof beat — no duplicated stats
+    await expect(page.locator('section[aria-label="Proof"] dd')).toHaveCount(0)
   })
 })
 
@@ -34,6 +61,55 @@ test.describe('finale (beat 8)', () => {
     await expect(page.locator('#finale').getByRole('heading', { level: 2 })).toContainText(
       "Let's build your magic",
     )
+  })
+})
+
+test.describe('case studies (content refresh P2)', () => {
+  test('four deep cases render with chips, stats, and live links', async ({ page }) => {
+    await page.goto('/')
+    const section = page.locator('section[aria-label="Case studies"]')
+    await section.scrollIntoViewIfNeeded()
+    await expect(section.getByRole('heading', { level: 2 })).toHaveText('Four builds, up close')
+
+    const caseHeadings = section.getByRole('heading', { level: 3 })
+    await expect(caseHeadings).toHaveCount(4)
+    for (const heading of [
+      'Helping mariners find safe water, a million times a day.',
+      'A quiet watchtower for your business numbers.',
+      'From idea to paying customers in 15 days.',
+      'Course creation used to take a month. Now it takes ten days.',
+    ]) {
+      await expect(section.getByRole('heading', { level: 3, name: heading })).toHaveText(heading)
+    }
+
+    // category chips, one per case (two share the "My own product" family)
+    for (const chip of [
+      'Client project · United States',
+      'My own product · AI for startups',
+      'My own product · Fintech',
+      'Product engineering · EdTech',
+    ]) {
+      await expect(section.getByText(chip, { exact: true })).toHaveCount(1)
+    }
+
+    // the four visit pills open the live sites safely in a new tab
+    const links = section.getByRole('link', { name: /see it live/ })
+    await expect(links).toHaveCount(4)
+    const expectedHrefs = [
+      'https://www.ditchnavigation.com',
+      'https://myquri.com',
+      'https://myextrack.com',
+      'https://whycosmos.com',
+    ]
+    for (const [index, link] of (await links.all()).entries()) {
+      await expect(link).toHaveAttribute('href', expectedHrefs[index])
+      await expect(link).toHaveAttribute('target', '_blank')
+      await expect(link).toHaveAttribute('rel', /noopener/)
+    }
+
+    // a sample stat from each end of the section
+    await expect(section.getByText('requests served, every day')).toBeAttached()
+    await expect(section.getByText('automated tests guarding the platform')).toBeAttached()
   })
 })
 

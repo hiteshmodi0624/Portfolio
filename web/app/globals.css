@@ -53,6 +53,35 @@ html {
   }
 }
 
+/* Beat 1 — the PDF cover's gradient headline word ("magic"), animated: the
+   violet→sky→blush ramp is wider than the word and drifts slowly across it,
+   a breathing shimmer rather than a spinner. Raw CSS animation, so it
+   self-gates below via the reduced-motion media query (the page-level
+   MotionConfig only governs motion/react). */
+.grad-word {
+  background: linear-gradient(
+    92deg,
+    var(--color-violet) 0%,
+    var(--color-sky) 35%,
+    var(--color-blush) 60%,
+    var(--color-violet) 100%
+  );
+  background-size: 250% 100%;
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  animation: grad-drift 9s ease-in-out infinite alternate;
+}
+
+@keyframes grad-drift {
+  from {
+    background-position: 0% 50%;
+  }
+  to {
+    background-position: 100% 50%;
+  }
+}
+
 /* Availability badge pulse */
 .badge-dot {
   animation: badge-pulse 2.4s ease-in-out infinite;
@@ -70,7 +99,8 @@ html {
 
 @media (prefers-reduced-motion: reduce) {
   .hero-wash,
-  .badge-dot {
+  .badge-dot,
+  .grad-word {
     animation: none;
   }
 }

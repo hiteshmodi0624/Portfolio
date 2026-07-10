@@ -8,14 +8,22 @@ const httpsUrl = z
 /** Committed, EXIF-stripped asset under public/images/. Shared validator for HeroContentSchema identity photo and HumanSchema photo. */
 const imageSrc = z.string().regex(/^\/images\/[a-z0-9.-]+\.(jpg|jpeg|png|webp)$/)
 
+/** In-page anchor like "#finale" or "#work" — CTAs never leave the page. */
+const anchorHref = z.string().regex(/^#[a-z][a-z-]*$/)
+
 export const HeroContentSchema = z.object({
   h1: z.string().min(1),
   sub: z.string().min(1),
   availability: z.string().min(1),
   ctaLabel: z.string().min(1),
-  /** In-page anchor the CTA and scroll cue jump to, e.g. "#finale". */
-  ctaHref: z.string().regex(/^#[a-z][a-z-]*$/),
-  scrollCue: z.string().min(1),
+  /** In-page anchor the primary CTA jumps to, e.g. "#finale". */
+  ctaHref: anchorHref,
+  /** P4 hero redesign: quieter second path ("See the work ↓" → #work).
+   * Replaces the old standalone scrollCue — one downward invitation, not two. */
+  secondaryCta: z.object({
+    label: z.string().min(1),
+    href: anchorHref,
+  }),
   /** P3.2 hero identity: photo chip + name line under the subhead. */
   identity: z.object({
     name: z.string().min(1),
@@ -48,6 +56,9 @@ export const ServiceSchema = z.object({
   title: z.string().min(1),
   hook: z.string().min(1),
   deliverables: z.array(z.string().min(1)).min(1),
+  /** Content refresh P3: the PDF page 3 "Good if:" self-qualifier line,
+   * rendered as a dashed box between deliverables and timeline. */
+  fit: z.string().min(1),
   timeline: z.string().min(1),
   ctaLabel: z.string().min(1),
 })
@@ -72,6 +83,9 @@ export const HumanSchema = z.object({
     label: z.string().min(1),
     items: z.array(z.string().min(1)).min(1),
   }),
+  /** Content refresh P3: quick-facts cards under the photo (PDF page 9
+   * .fact treatment — mono micro-label + plain body). */
+  facts: z.array(z.object({ label: z.string().min(1), body: z.string().min(1) })).min(1),
   photo: z.object({
     /** Committed, EXIF-stripped asset under public/images/ (never the original). */
     src: imageSrc,
@@ -140,6 +154,44 @@ export const StorySchema = z.object({
         message: 'storefront metric must improve (to > from)',
       }),
   }),
+})
+
+/* ——— Content refresh P2: deep case studies (PDF portfolio pages 4–7) ——— */
+
+/** Committed screenshot from scripts/capture-shots.ts — same shape as
+ * ProjectSchema's image, but REQUIRED: a case study never renders text-only. */
+const caseShot = z.object({
+  src: z.string().regex(/^\/shots\/[a-z0-9-]+\.(png|webp)$/),
+  width: z.number().int().positive(),
+  height: z.number().int().positive(),
+  alt: z.string().min(1),
+})
+
+export const CaseStudySchema = z.object({
+  slug: z.string().regex(/^[a-z][a-z0-9-]*$/),
+  heading: z.string().min(1),
+  /** Rendered as a tinted chip; tone maps to the pastel wash palette. */
+  category: z.object({
+    label: z.string().min(1),
+    tone: z.enum(['sky', 'violet', 'blush']),
+  }),
+  /** Freeform labelled prose blocks — the PDF varies them per case
+   * ('The problem' / 'What I built' / 'The outcome', 'The idea', …). */
+  blocks: z
+    .array(z.object({ label: z.string().min(1), body: z.string().min(1) }))
+    .min(3),
+  /** Exactly three stat cards per case, like the PDF's .case-stats row. */
+  stats: z.array(z.object({ value: z.string().min(1), label: z.string().min(1) })).length(3),
+  url: httpsUrl,
+  /** The mono tech line under the browser frame. */
+  tech: z.string().min(1),
+  image: caseShot,
+})
+
+export const CasesSchema = z.object({
+  heading: z.string().min(1),
+  lede: z.string().min(1),
+  items: z.array(CaseStudySchema).min(1),
 })
 
 /* ——— P2: beat 5 proof gallery (spec §3) ——— */
@@ -217,6 +269,8 @@ export type Service = z.infer<typeof ServiceSchema>
 export type ServicesIntro = z.infer<typeof ServicesIntroSchema>
 export type HumanContent = z.infer<typeof HumanSchema>
 export type StoryContent = z.infer<typeof StorySchema>
+export type CaseStudy = z.infer<typeof CaseStudySchema>
+export type CasesContent = z.infer<typeof CasesSchema>
 export type Project = z.infer<typeof ProjectSchema>
 export type ProofContent = z.infer<typeof ProofSchema>
 export type Stats = z.infer<typeof StatsSchema>

@@ -9,9 +9,9 @@ export const human: HumanContent = HumanSchema.parse({
   heading: 'One engineer, no circus',
   name: 'Hitesh Modi',
   story: [
-    "I'm Hitesh. Every project on this page — design, build, launch — was done by me, start to finish. No agency, no hand-offs, no \"let me check with the team\".",
-    "I build with AI every single day. That's why things that used to take months take me weeks — and why the helpers I build actually work the way the demos promise.",
-    'Clients run my work in Australia, the US, and Southeast Asia. Wherever you are, you get answers the same day — usually within the hour.',
+    "I'm Hitesh. Every project on this page, from design to build to launch, was done by me, start to finish. No agency, no hand-offs, no \"let me check with the team\".",
+    "I build with AI every single day. That's why things that used to take months take me weeks, and why the helpers I build actually work the way the demos promise.",
+    'Clients run my work in Australia, the US, and Southeast Asia. Wherever you are, you get answers the same day, usually within the hour.',
   ],
   nerdyBits: {
     label: 'the nerdy bits',
@@ -22,10 +22,24 @@ export const human: HumanContent = HumanSchema.parse({
       'Production systems serving 1M+ requests a day',
     ],
   },
+  facts: [
+    {
+      label: 'Home base',
+      body: 'Guwahati, India. Clients across four time zones, from Sydney to San Francisco.',
+    },
+    {
+      label: 'Education',
+      body: 'B.Tech from NIT Kurukshetra, class of 2024.',
+    },
+    {
+      label: 'Off hours',
+      body: 'Chess, mostly. And competitive programming: ranked 1559 in the world at Google Kickstart.',
+    },
+  ],
   photo: {
-    src: '/images/hitesh-640.jpg',
-    alt: 'Hitesh Modi — portrait',
+    src: '/images/hitesh-crop-640.jpg',
+    alt: 'Portrait of Hitesh Modi',
     width: 640,
-    height: 853,
+    height: 575,
   },
 })

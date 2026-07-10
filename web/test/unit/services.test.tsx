@@ -15,6 +15,7 @@ const fixtureServices = ServicesSchema.parse([
     title: 'Door One',
     hook: 'Hook one.',
     deliverables: ['Thing A', 'Thing B'],
+    fit: 'Good if: you want door one.',
     timeline: 'about 2 weeks',
     ctaLabel: 'Book a call',
   },
@@ -23,6 +24,7 @@ const fixtureServices = ServicesSchema.parse([
     title: 'Door Two',
     hook: 'Hook two.',
     deliverables: ['Thing C'],
+    fit: 'Good if: you want door two.',
     timeline: '1 week',
     ctaLabel: 'Book a call',
   },
@@ -40,6 +42,20 @@ describe('Services (beat 6)', () => {
         expect(screen.getByText(item)).toBeDefined()
       }
       expect(screen.getByText(service.timeline)).toBeDefined()
+    }
+  })
+
+  it('renders a fit line per door — full copy present, "Good if" lead bolded', () => {
+    const { container } = render(<Services intro={fixtureIntro} services={fixtureServices} />)
+    const fits = container.querySelectorAll('.service-fit')
+    expect(fits).toHaveLength(2)
+    fixtureServices.forEach((service, index) => {
+      expect(fits[index]?.textContent).toBe(service.fit)
+    })
+    const leads = screen.getAllByText('Good if:')
+    expect(leads).toHaveLength(2)
+    for (const lead of leads) {
+      expect(lead.tagName).toBe('STRONG')
     }
   })
 
@@ -73,6 +89,12 @@ describe('Services (beat 6)', () => {
     expect(screen.getByRole('heading', { level: 3, name: 'The Landing Page' })).toBeDefined()
     expect(screen.getByRole('heading', { level: 3, name: 'The AI Employee' })).toBeDefined()
     expect(screen.getByRole('heading', { level: 3, name: 'The Full Build' })).toBeDefined()
+  })
+
+  it('ships a "Good if:" fit line on every door', () => {
+    render(<Services intro={servicesIntro} services={services} />)
+    expect(services.every((service) => service.fit.startsWith('Good if:'))).toBe(true)
+    expect(screen.getAllByText('Good if:')).toHaveLength(3)
   })
 
   it('keeps the deliverables list in the DOM (CSS-only hover reveal — always present for touch/reduced-motion)', () => {

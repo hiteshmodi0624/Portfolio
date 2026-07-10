@@ -22,7 +22,7 @@ const jetbrains = JetBrains_Mono({
   display: 'swap',
 })
 
-const title = `${profile.name} — ${profile.hero.h1}`
+const title = `${profile.name} · ${profile.hero.h1}`
 
 export const metadata: Metadata = {
   metadataBase: new URL(profile.siteUrl),
