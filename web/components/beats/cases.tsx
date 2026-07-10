@@ -10,11 +10,14 @@ export interface CasesProps {
   cases: CasesContent
 }
 
-/** Chip tints — the PDF's .chip palette on the site's pastel washes. */
+/** Chip tints — the PDF's .chip palette on the site's pastel washes, with
+ * the text darkened one step so the 11px labels meet WCAG AA 4.5:1 on their
+ * opaque washes: #1971C2 on #EEF7FF = 4.63:1, #6741D9 on #F5F3FF = 5.74:1,
+ * #C2255C on #FDF2F8 = 5.18:1 (the PDF's print colors computed 3.9–4.2). */
 const TONE_CLASSES: Record<CaseStudy['category']['tone'], string> = {
-  sky: 'border-sky/40 bg-wash-sky text-[#1C7ED6]',
-  violet: 'border-violet/35 bg-wash-lavender text-violet',
-  blush: 'border-blush/40 bg-wash-blush text-[#D6336C]',
+  sky: 'border-sky/40 bg-wash-sky text-[#1971C2]',
+  violet: 'border-violet/35 bg-wash-lavender text-[#6741D9]',
+  blush: 'border-blush/40 bg-wash-blush text-[#C2255C]',
 }
 
 /** Fake browser frame mirroring the PDF's .browser treatment: three dots,
@@ -26,7 +29,9 @@ function BrowserFrame({ image, host }: { image: CaseStudy['image']; host: string
         <span aria-hidden="true" className="block h-2 w-2 rounded-full bg-chaos-red" />
         <span aria-hidden="true" className="block h-2 w-2 rounded-full bg-chaos-amber" />
         <span aria-hidden="true" className="block h-2 w-2 rounded-full bg-[#34C759]" />
-        <span className="ml-2 rounded-md bg-white px-2.5 py-0.5 font-mono text-xs font-semibold text-violet">
+        {/* darkened violet (#6741D9 on white = 6.30:1) — the violet token
+            computes 4.35:1 on white, under WCAG AA for 12px text */}
+        <span className="ml-2 rounded-md bg-white px-2.5 py-0.5 font-mono text-xs font-semibold text-[#6741D9]">
           {host}
         </span>
       </div>

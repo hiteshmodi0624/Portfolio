@@ -86,12 +86,15 @@ export function Proof({ proof }: ProofProps) {
                         <h3 className="font-display text-xl font-semibold text-ink">{project.name}</h3>
                       </div>
                       {/* every card wears a kind chip, PDF chip palette:
-                          client = sky wash, own product = lavender wash */}
+                          client = sky wash, own product = lavender wash.
+                          Text darkened one step past the PDF for WCAG AA at
+                          12px: #1971C2 on #EEF7FF = 4.63:1, #6741D9 on
+                          #F5F3FF = 5.74:1 (see cases.tsx TONE_CLASSES). */}
                       <span
                         className={`shrink-0 whitespace-nowrap rounded-full border px-2.5 py-0.5 text-xs ${
                           project.kind === 'client'
-                            ? 'border-sky/40 bg-wash-sky text-[#1C7ED6]'
-                            : 'border-violet/35 bg-wash-lavender text-violet'
+                            ? 'border-sky/40 bg-wash-sky text-[#1971C2]'
+                            : 'border-violet/35 bg-wash-lavender text-[#6741D9]'
                         }`}
                       >
                         {project.kind === 'client' ? 'client work' : 'my own product'}
@@ -105,7 +108,7 @@ export function Proof({ proof }: ProofProps) {
                           href={project.url}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="inline-block rounded-full bg-wash-lavender px-3.5 py-1.5 font-mono text-xs font-semibold text-violet transition hover:bg-violet hover:text-white"
+                          className="inline-block rounded-full bg-wash-lavender px-3.5 py-1.5 font-mono text-xs font-semibold text-[#6741D9] transition hover:bg-[#6741D9] hover:text-white"
                         >
                           {displayHost(project.url)} ↗
                         </a>
