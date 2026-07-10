@@ -1,9 +1,13 @@
-import { render, screen } from '@testing-library/react'
+import { act, render, screen } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
 import { Storefront } from '../../components/beats/storefront'
 import { story } from '../../content/story'
+import { setPrefersReducedMotion, setViewportWide } from '../setup'
 
-// jsdom = static fallback path (before/after side by side, all copy readable).
+// P3.1: Storefront is a normal-flow section. jsdom (motion allowed) renders
+// the stacked auto-morph layers at their resting state (before visible,
+// after waiting at opacity 0 — jsdom's IntersectionObserver never fires);
+// reduced motion renders the labelled side-by-side comparison.
 describe('Storefront (beat 4)', () => {
   const renderStorefront = () => render(<Storefront storefront={story.storefront} />)
 
@@ -36,5 +40,35 @@ describe('Storefront (beat 4)', () => {
     expect(screen.getByText('up from 2')).toBeDefined()
     const section = container.querySelector('section[aria-label="The storefront"]') as HTMLElement
     expect(section.querySelector('.sticky')).toBeNull()
+  })
+
+  it('never pins: wide viewports get the same normal-flow section (P3.1)', async () => {
+    setViewportWide(true)
+    const { container } = renderStorefront()
+    await act(async () => {})
+    const section = container.querySelector('section[aria-label="The storefront"]') as HTMLElement
+    expect(section.querySelector('.sticky')).toBeNull()
+    expect(section.style.height).toBe('')
+  })
+
+  it('mounts the auto-morph layers with their data-morph anchors (P3.1)', () => {
+    const { container } = renderStorefront()
+    const before = container.querySelector('[data-morph="before"]') as HTMLElement
+    const after = container.querySelector('[data-morph="after"]') as HTMLElement
+    expect(before).not.toBeNull()
+    expect(after).not.toBeNull()
+    // resting state pre-entry: before visible, after waiting to crossfade in
+    expect(before.style.opacity).toBe('1')
+    expect(after.style.opacity).toBe('0')
+  })
+
+  it('renders the labelled side-by-side comparison under reduced motion', async () => {
+    setPrefersReducedMotion(true)
+    const { container } = renderStorefront()
+    await act(async () => {})
+    expect(container.querySelector('[data-morph="before"]')).toBeNull()
+    expect(screen.getByText('before')).toBeDefined()
+    expect(screen.getByText('after')).toBeDefined()
+    expect(screen.getByText('Saturday has three openings left.')).toBeDefined()
   })
 })
