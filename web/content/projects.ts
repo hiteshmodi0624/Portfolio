@@ -23,6 +23,8 @@ export const proof: ProofContent = ProofSchema.parse({
       outcome: 'From idea to paying customers in 15 days',
       url: 'https://myextrack.com',
       kind: 'product',
+      image: { src: '/shots/extrack.png', width: 1200, height: 750, alt: 'Extrack — live site' },
+      logo: { src: '/logos/extrack.png', alt: 'Extrack logo' },
     },
     {
       slug: 'whycosmos',
@@ -31,6 +33,8 @@ export const proof: ProofContent = ProofSchema.parse({
       outcome: 'Lessons, progress, and payments — one place',
       url: 'https://whycosmos.com',
       kind: 'product',
+      image: { src: '/shots/whycosmos.png', width: 1200, height: 750, alt: 'WhyCosmos — live site' },
+      logo: { src: '/logos/whycosmos.png', alt: 'WhyCosmos logo' },
     },
     {
       slug: 'quri',
@@ -39,6 +43,8 @@ export const proof: ProofContent = ProofSchema.parse({
       outcome: 'Spots trouble before customers ever notice',
       url: 'https://myquri.com',
       kind: 'product',
+      image: { src: '/shots/quri.png', width: 1200, height: 750, alt: 'quri — live site' },
+      logo: { src: '/logos/quri.png', alt: 'quri logo' },
     },
     {
       slug: 'safewash',
@@ -47,6 +53,8 @@ export const proof: ProofContent = ProofSchema.parse({
       outcome: 'Invoices for business customers, sent and settled on time',
       url: 'https://www.safewash.co.in',
       kind: 'product',
+      image: { src: '/shots/safewash.png', width: 1200, height: 750, alt: 'Safewash — live site' },
+      logo: { src: '/logos/safewash.png', alt: 'Safewash logo' },
     },
     {
       slug: 'ditch-navigation',
@@ -55,6 +63,8 @@ export const proof: ProofContent = ProofSchema.parse({
       outcome: 'Client work in the US — where the 1M+ requests a day come from',
       url: 'https://www.ditchnavigation.com',
       kind: 'client',
+      image: { src: '/shots/ditch-navigation.png', width: 1200, height: 750, alt: 'Ditch Navigation — live site' },
+      logo: { src: '/logos/ditch-navigation.png', alt: 'Ditch Navigation logo' },
     },
     {
       slug: 'aimers-international',
@@ -63,6 +73,10 @@ export const proof: ProofContent = ProofSchema.parse({
       outcome: 'Client work, from first sketch to live site',
       url: 'https://www.aimersinternational.com',
       kind: 'client',
+      // capture-shots skipped this site (favicon fetch threw — "Request
+      // path contains unescaped characters"), so the script's own
+      // text-only-fallback rule applies here: no image/logo block, even
+      // though the screenshot itself rendered cleanly before the throw.
     },
     {
       slug: 'fidus-global',
@@ -71,6 +85,8 @@ export const proof: ProofContent = ProofSchema.parse({
       outcome: 'Client work, shipped and maintained',
       url: 'https://www.fidusglobal.in',
       kind: 'client',
+      image: { src: '/shots/fidus-global.png', width: 1200, height: 750, alt: 'Fidus Global — live site' },
+      logo: { src: '/logos/fidus-global.png', alt: 'Fidus Global logo' },
     },
     {
       slug: 'rtopilot',
@@ -79,6 +95,8 @@ export const proof: ProofContent = ProofSchema.parse({
       outcome: 'Heavy compliance admin, handled quietly',
       url: 'https://www.rtopilot.com.au',
       kind: 'client',
+      image: { src: '/shots/rtopilot.png', width: 1200, height: 750, alt: 'RTOPilot — live site' },
+      logo: { src: '/logos/rtopilot.png', alt: 'RTOPilot logo' },
     },
   ],
 })

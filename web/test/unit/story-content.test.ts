@@ -1,3 +1,9 @@
+import { existsSync } from 'node:fs'
+// Node's URL, not the global — jsdom's test environment polyfills `URL`
+// globally and resolves relative bases against http://localhost:3000/,
+// silently discarding a file:// base (import.meta.url) instead of erroring,
+// so `new URL('../../public', import.meta.url)` must use this import.
+import { fileURLToPath, URL as NodeURL } from 'node:url'
 import { describe, expect, it } from 'vitest'
 import {
   ProjectSchema,
@@ -221,5 +227,26 @@ describe('shipped story content', () => {
       'https://www.safewash.co.in',
     )
     expect(proof.projects.filter((project) => project.url === undefined)).toHaveLength(0)
+  })
+})
+
+describe('gallery assets (P3.4)', () => {
+  it('at least one shipped project carries a screenshot and a logo', () => {
+    expect(proof.projects.some((project) => project.image !== undefined)).toBe(true)
+    expect(proof.projects.some((project) => project.logo !== undefined)).toBe(true)
+  })
+
+  it('every referenced asset is committed and matches its slug', () => {
+    const publicDir = fileURLToPath(new NodeURL('../../public', import.meta.url))
+    for (const project of proof.projects) {
+      if (project.image) {
+        expect(project.image.src).toBe(`/shots/${project.slug}.png`)
+        expect(existsSync(`${publicDir}${project.image.src}`)).toBe(true)
+      }
+      if (project.logo) {
+        expect(project.logo.src).toBe(`/logos/${project.slug}.png`)
+        expect(existsSync(`${publicDir}${project.logo.src}`)).toBe(true)
+      }
+    }
   })
 })

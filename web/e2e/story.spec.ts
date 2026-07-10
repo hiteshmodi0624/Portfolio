@@ -352,6 +352,21 @@ test.describe('services (beat 6, P3.3)', () => {
   })
 })
 
+test.describe('proof gallery visuals (P3.4)', () => {
+  test('cards with screenshots render lazy images with explicit dimensions', async ({ page }) => {
+    await page.goto('/')
+    const proof = page.locator('section[aria-label="Proof"]')
+    await proof.scrollIntoViewIfNeeded()
+    const shots = proof.locator('img[src^="/shots/"]')
+    expect(await shots.count()).toBeGreaterThan(0)
+    for (const shot of await shots.all()) {
+      await expect(shot).toHaveAttribute('loading', 'lazy')
+      await expect(shot).toHaveAttribute('width', /^\d+$/)
+      await expect(shot).toHaveAttribute('height', /^\d+$/)
+    }
+  })
+})
+
 // ---------------------------------------------------------------------------
 // Carry-forward from P2 Task 3: jsdom cannot observe rAF-driven repaints or
 // real pointer-type discrimination, so these two behaviors are proven here,
