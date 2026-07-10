@@ -25,6 +25,20 @@ const ICON_PROPS = {
   className: 'h-8 w-8',
 } as const
 
+/** PDF page 3 .fit treatment: the "Good if:" lead is bolded, the rest stays
+ * plain. Splits at the first colon; a fit line without one renders as-is. */
+function FitLine({ fit }: { fit: string }) {
+  const colon = fit.indexOf(':')
+  const lead = colon === -1 ? null : fit.slice(0, colon + 1)
+  const rest = colon === -1 ? fit : fit.slice(colon + 1)
+  return (
+    <p className="service-fit mt-4 rounded-xl border border-dashed border-ink/20 bg-white/70 px-4 py-3 text-sm leading-relaxed text-ink">
+      {lead === null ? null : <strong className="font-bold">{lead}</strong>}
+      {rest}
+    </p>
+  )
+}
+
 const ICONS: Record<string, ReactNode> = {
   /** browser window with a bold CTA block — the landing page */
   'the-landing-page': (
@@ -98,6 +112,7 @@ export function Services({ intro, services }: ServicesProps) {
                     ))}
                   </ul>
                 </div>
+                <FitLine fit={service.fit} />
                 <p className="mt-auto pt-4 font-mono text-xs text-muted">{service.timeline}</p>
                 <a
                   href="#finale"

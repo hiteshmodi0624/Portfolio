@@ -23,6 +23,15 @@ describe('Human (beat 7)', () => {
     expect(img.getAttribute('loading')).toBe('lazy')
   })
 
+  it('renders every fact card — micro-label and body', () => {
+    renderHuman()
+    expect(human.facts.length).toBeGreaterThanOrEqual(1)
+    for (const fact of human.facts) {
+      expect(screen.getByText(fact.label)).toBeDefined()
+      expect(screen.getByText(fact.body)).toBeDefined()
+    }
+  })
+
   it('tucks the nerdy bits into a native, collapsed <details>', () => {
     const { container } = renderHuman()
     const details = container.querySelector('details') as HTMLDetailsElement

@@ -48,6 +48,9 @@ export const ServiceSchema = z.object({
   title: z.string().min(1),
   hook: z.string().min(1),
   deliverables: z.array(z.string().min(1)).min(1),
+  /** Content refresh P3: the PDF page 3 "Good if:" self-qualifier line,
+   * rendered as a dashed box between deliverables and timeline. */
+  fit: z.string().min(1),
   timeline: z.string().min(1),
   ctaLabel: z.string().min(1),
 })
@@ -72,6 +75,9 @@ export const HumanSchema = z.object({
     label: z.string().min(1),
     items: z.array(z.string().min(1)).min(1),
   }),
+  /** Content refresh P3: quick-facts cards under the photo (PDF page 9
+   * .fact treatment — mono micro-label + plain body). */
+  facts: z.array(z.object({ label: z.string().min(1), body: z.string().min(1) })).min(1),
   photo: z.object({
     /** Committed, EXIF-stripped asset under public/images/ (never the original). */
     src: imageSrc,

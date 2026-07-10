@@ -97,6 +97,13 @@ describe('ServicesSchema', () => {
     ]
     expect(ServicesSchema.safeParse(bad).success).toBe(false)
   })
+
+  it('rejects a service without a fit line', () => {
+    const bad = [
+      { slug: 'x', title: 'X', hook: 'x', deliverables: ['a'], timeline: 'x', ctaLabel: 'x' },
+    ]
+    expect(ServicesSchema.safeParse(bad).success).toBe(false)
+  })
 })
 
 describe('shipped content', () => {

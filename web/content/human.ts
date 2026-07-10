@@ -22,10 +22,24 @@ export const human: HumanContent = HumanSchema.parse({
       'Production systems serving 1M+ requests a day',
     ],
   },
+  facts: [
+    {
+      label: 'Home base',
+      body: 'Guwahati, India. Clients across four time zones, from Sydney to San Francisco.',
+    },
+    {
+      label: 'Education',
+      body: 'B.Tech from NIT Kurukshetra, class of 2024.',
+    },
+    {
+      label: 'Off hours',
+      body: 'Chess, mostly. And competitive programming: ranked 1559 in the world at Google Kickstart.',
+    },
+  ],
   photo: {
-    src: '/images/hitesh-640.jpg',
+    src: '/images/hitesh-crop-640.jpg',
     alt: 'Portrait of Hitesh Modi',
     width: 640,
-    height: 853,
+    height: 660,
   },
 })
