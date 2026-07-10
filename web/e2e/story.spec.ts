@@ -168,6 +168,11 @@ test.describe('reduced motion — the story stays fully readable', () => {
         )
         .toBe('1')
     }
+    // guard: no horizontal overflow from fallback wash variants
+    const noHorizontalPan = await page.evaluate(
+      () => document.documentElement.scrollWidth <= document.documentElement.clientWidth,
+    )
+    expect(noHorizontalPan).toBe(true)
   })
 })
 
@@ -190,6 +195,11 @@ test.describe('mobile-light (375px)', () => {
         { timeout: 5000 },
       )
       .toBe('1')
+    // guard: no horizontal overflow from fallback wash variants
+    const noHorizontalPan = await page.evaluate(
+      () => document.documentElement.scrollWidth <= document.documentElement.clientWidth,
+    )
+    expect(noHorizontalPan).toBe(true)
   })
 })
 

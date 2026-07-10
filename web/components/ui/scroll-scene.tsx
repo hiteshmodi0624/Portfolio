@@ -78,7 +78,7 @@ export function ScrollScene({
       id={id}
       ref={ref}
       aria-label={ariaLabel}
-      className={className}
+      className={`overflow-x-clip ${className}`}
       style={scrub ? { height: `${lengthSvh * 100}svh` } : undefined}
     >
       {scrub ? (
