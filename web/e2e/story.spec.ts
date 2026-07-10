@@ -137,8 +137,16 @@ test.describe('natural scroll (P3.1) — no pinning, time-driven scenes', () => 
     }) => {
       test.skip(Boolean(isMobile), 'time-driven entry is proven on desktop; mobile readability is covered below')
       await page.goto('/')
-      await scrollSectionIntoView(page, scene.label)
       const target = scene.probe(page.locator(`section[aria-label="${scene.label}"]`))
+      // Hidden-start half (carried over from the pinned suite's opacity-0
+      // assertion): at page top every scene sits below the fold — the hero
+      // fills the first viewport exactly; verified geometry on 1440×900 puts
+      // the nearest probe (the chaos grid) at y≈1011 — so each probe must
+      // still be at its initial opacity 0. SSR inlines that opacity, so this
+      // one-shot read cannot race hydration. A scene that renders pre-settled
+      // (entrance never actually runs) fails here.
+      expect(await target.evaluate((el) => getComputedStyle(el).opacity)).toBe('0')
+      await scrollSectionIntoView(page, scene.label)
       await expect
         .poll(() => target.evaluate((el) => getComputedStyle(el).opacity), {
           timeout: scene.timeoutMs,
@@ -165,6 +173,15 @@ test.describe('natural scroll (P3.1) — no pinning, time-driven scenes', () => 
     test.skip(Boolean(isMobile), 'time-driven entry is proven on desktop')
     await page.goto('/')
     await scrollSectionIntoView(page, 'The storefront')
+    // Pre-morph half (Task 1.4 review carry-forward): the "before" page owns
+    // the stage for MORPH_DELAY_MS (~2s) after entry, so assert it visible
+    // NOW, fast — the 1s timeout sits well inside the 2s pre-morph window and
+    // can never straddle the crossfade. A regression that renders "before"
+    // hidden from the start fails here instead of slipping past an
+    // end-state-only check.
+    await expect(page.locator('[data-morph="before"]')).toHaveCSS('opacity', '1', {
+      timeout: 1_000,
+    })
     await expect
       .poll(
         () => page.locator('[data-morph="after"]').evaluate((el) => getComputedStyle(el).opacity),
