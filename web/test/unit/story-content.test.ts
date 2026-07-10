@@ -146,7 +146,10 @@ describe('shipped story content', () => {
     expect(proof.projects.find((project) => project.slug === 'quri')?.url).toBe(
       'https://myquri.com',
     )
-    // Safewash is real work with no public site — the only card without a link
-    expect(proof.projects.filter((project) => project.url === undefined)).toHaveLength(1)
+    // Safewash's public site went live 2026-07 (spec P3 §1) — every card links out now
+    expect(proof.projects.find((project) => project.slug === 'safewash')?.url).toBe(
+      'https://www.safewash.co.in',
+    )
+    expect(proof.projects.filter((project) => project.url === undefined)).toHaveLength(0)
   })
 })

@@ -6,8 +6,7 @@ import { ProofSchema, type ProofContent } from './schema'
  * CLIENT-URL SLOT MECHANISM (in use): `kind: 'client'` entries are shipped
  * client work — all URLs verified live 2026-07-10. Append future client
  * sites the same way; the gallery renders whatever validates, no component
- * changes needed. Safewash is real work with no public site, so it ships as
- * the one card without a link.
+ * changes needed. Safewash's public site is live (https://www.safewash.co.in, verified 2026-07-10).
  *
  * Ditch Navigation is where the ticker's "1M+ requests a day" figure comes
  * from — the canonical number lives in content/stats.json (manual block);
@@ -46,6 +45,7 @@ export const proof: ProofContent = ProofSchema.parse({
       name: 'Safewash',
       tagline: 'Billing without the back-and-forth',
       outcome: 'Invoices for business customers, sent and settled on time',
+      url: 'https://www.safewash.co.in',
       kind: 'product',
     },
     {
