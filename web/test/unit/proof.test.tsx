@@ -68,6 +68,14 @@ describe('Proof gallery visuals (P3.4)', () => {
         image: { src: '/shots/with-image.png', width: 1200, height: 750, alt: 'With Image — live site' },
         logo: { src: '/logos/with-image.png', alt: 'With Image logo' },
       },
+      {
+        slug: 'logo-only',
+        name: 'Logo Only',
+        tagline: 't',
+        outcome: 'o',
+        kind: 'product',
+        logo: { src: '/logos/logo-only.png', alt: 'Logo Only logo' },
+      },
       { slug: 'text-only', name: 'Text Only', tagline: 't', outcome: 'o', kind: 'product' },
     ],
   })
@@ -88,10 +96,26 @@ describe('Proof gallery visuals (P3.4)', () => {
     expect(logo.getAttribute('loading')).toBe('lazy')
   })
 
+  it('renders a logo chip without a screenshot header when only logo is present', () => {
+    render(<Proof proof={galleryFixture} ticker={ticker} />)
+    const logo = screen.getByRole('img', { name: 'Logo Only logo' })
+    expect(logo.getAttribute('src')).toBe('/logos/logo-only.png')
+    expect(logo.getAttribute('loading')).toBe('lazy')
+    expect(logo.getAttribute('width')).toBe('20')
+    expect(logo.getAttribute('height')).toBe('20')
+    // scope to this project's own card: exactly one img (the logo chip) —
+    // no screenshot header renders when image is absent, even with a logo
+    const heading = screen.getByRole('heading', { level: 3, name: 'Logo Only' })
+    const card = heading.closest('li')
+    expect(card).not.toBeNull()
+    expect(card!.querySelectorAll('img')).toHaveLength(1)
+  })
+
   it('falls back to text-only when image and logo are absent', () => {
     const { container } = render(<Proof proof={galleryFixture} ticker={ticker} />)
     expect(screen.getByRole('heading', { level: 3, name: 'Text Only' })).toBeDefined()
-    // exactly two imgs in the whole gallery: the fixture's screenshot + logo
-    expect(container.querySelectorAll('img')).toHaveLength(2)
+    // exactly three imgs in the whole gallery: with-image's screenshot + its
+    // logo, plus logo-only's logo chip — text-only contributes none
+    expect(container.querySelectorAll('img')).toHaveLength(3)
   })
 })
