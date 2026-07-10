@@ -124,9 +124,19 @@ html {
     display: grid;
     grid-template-rows: 0fr;
     opacity: 0;
+    /* visibility is an inherited property — setting it here (rather than
+       relying on opacity/grid-row alone) makes every descendant's computed
+       visibility resolve to hidden too. Automation tools (Playwright's
+       toBeVisible) check an element's OWN opacity and bounding box, not an
+       ancestor's opacity or overflow-clipping, so opacity/grid-rows alone
+       left the collapsed list "visible" to Playwright even though a sighted
+       visitor could not see it. The 0.3s delay keeps the switch to hidden in
+       step with the collapse animation instead of snapping instantly. */
+    visibility: hidden;
     transition:
       grid-template-rows 0.3s ease,
-      opacity 0.3s ease;
+      opacity 0.3s ease,
+      visibility 0s 0.3s;
   }
   .service-door .service-door-list > ul {
     overflow: hidden;
@@ -135,5 +145,10 @@ html {
   .service-door:focus-within .service-door-list {
     grid-template-rows: 1fr;
     opacity: 1;
+    visibility: visible;
+    transition:
+      grid-template-rows 0.3s ease,
+      opacity 0.3s ease,
+      visibility 0s 0s;
   }
 }
