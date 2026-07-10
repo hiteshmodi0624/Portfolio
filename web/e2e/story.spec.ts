@@ -77,32 +77,18 @@ test.describe('story beats 2–5 (content)', () => {
 test.describe('scroll scrub (desktop pin)', () => {
   test.skip(({ isMobile }) => Boolean(isMobile), 'below 768px the beats ship the static light variant')
 
-  // ScrollScene's useScroll(target, offset) is eligible for motion/react's
-  // native-timeline acceleration (window.ViewTimeline / window.ScrollTimeline)
-  // in Chromium: scroll progress is driven off-main-thread by the browser's
-  // own CSS scroll-driven-animations implementation instead of a JS 'scroll'
-  // listener. Confirmed by direct repro (see PR discussion / task report): if
-  // a ScrollScene mounts while still short (the static fallback, before its
-  // useMediaQuery effect flips it to the tall pinned variant) and the test
-  // then jumps straight to a deep scroll offset with one instant
-  // `window.scrollTo`, the native timeline can latch onto the pre-hydration
-  // geometry and never re-derive after the layout settles — every derived
-  // useTransform reads the correct scrollYProgress (verified via a debug
-  // probe) EXCEPT the DOM never receives the corresponding style write, so
-  // getComputedStyle stays wrong indefinitely (not a transient race — it does
-  // not self-correct even after 5+ seconds of polling or repeated rescrolls).
-  // Real visitors never hit this: they scroll gradually, long after the page
-  // has settled. Disabling the two native-timeline globals before the app's
-  // JS runs forces motion/react onto its (equally correct) JS scroll-listener
-  // path, which tracks instant programmatic scrolls deterministically.
-  test.beforeEach(async ({ page }) => {
-    await page.addInitScript(() => {
-      // @ts-expect-error test-only: force motion/react's non-accelerated path
-      delete window.ViewTimeline
-      // @ts-expect-error test-only: force motion/react's non-accelerated path
-      delete window.ScrollTimeline
-    })
-  })
+  // No addInitScript neutralization here (p2-task-10 report, "Fix round 1"):
+  // the ScrollTimeline/ViewTimeline desync this used to work around was a
+  // REAL bug, not a Playwright-artifact — confirmed by direct repro against
+  // the production build with realistic, continuous mouse-wheel scrolling
+  // (no synthetic Playwright scroll pattern involved) — and root-caused to
+  // `useScroll`'s `['start start', 'end end']` offset mapping to the CSS
+  // named range `contain 0%`–`contain 100%`, which is only well-defined for
+  // a subject that fits inside the scrollport — never true for a 3-viewport-
+  // tall pinned section. Fixed in production
+  // (web/components/ui/scroll-scene.tsx sets motion-dom's public
+  // `supportsFlags.scrollTimeline/viewTimeline = false`), so this describe
+  // block now exercises the real, unmodified app.
 
   test('chaos pins for multiple viewports and tumbles cards in', async ({ page }) => {
     await page.goto('/')

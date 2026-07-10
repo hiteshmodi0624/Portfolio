@@ -1,8 +1,38 @@
 'use client'
 
-import { useScroll, useReducedMotion, type MotionValue } from 'motion/react'
+import { supportsFlags, useScroll, useReducedMotion, type MotionValue } from 'motion/react'
 import { useRef, type ReactNode } from 'react'
 import { useMediaQuery } from '@/lib/use-media'
+
+/**
+ * Force motion/react off the native ViewTimeline/ScrollTimeline acceleration
+ * path for every `useScroll` call in this module.
+ *
+ * Root cause (p2-task-10 report, "Fix round 1"): `useScroll`'s `['start
+ * start', 'end end']` offset — the standard "pin the whole section, scrub
+ * start-to-end" pattern — maps (via motion/react's own offset-to-range
+ * preset table) to the CSS named range `contain 0%`–`contain 100%`. Per the
+ * scroll-driven-animations spec, "contain" is only well-defined while the
+ * *entire* subject box fits inside the scrollport at some scroll position —
+ * true for typical reveal-on-scroll elements, but never true here: every
+ * `ScrollScene` pins a subject 3 viewport-heights tall specifically so it can
+ * be scrubbed *through*, not "contained". Confirmed by direct repro against
+ * the production build (real, continuous mouse-wheel scrolling, no
+ * Playwright-only scroll pattern): Chromium's native acceleration produces a
+ * non-monotonic progress curve for this offset+geometry combination — e.g. a
+ * pinned card's derived opacity rises then falls back toward 0 as real
+ * scrollY only ever increases — independent of any mount-timing race (an
+ * earlier fix attempt that re-keyed the section on the fallback→scrub swap,
+ * forcing a fresh `useScroll` registration against already-settled geometry,
+ * produced byte-identical results, ruling out a stale-geometry-at-creation
+ * theory). `supportsFlags` is `motion-dom`'s own public, typed override for
+ * exactly this kind of environment mismatch (see
+ * node_modules/motion-dom/dist/es/utils/supports/flags.mjs) — setting it
+ * forces every `useScroll` in the app onto the equally-correct, JS
+ * `scroll`-listener path, which tracks this offset correctly.
+ */
+supportsFlags.scrollTimeline = false
+supportsFlags.viewTimeline = false
 
 export interface ScrollSceneProps {
   id?: string
