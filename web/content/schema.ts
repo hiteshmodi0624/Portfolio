@@ -51,6 +51,12 @@ export const ServiceSchema = z.object({
 
 export const ServicesSchema = z.array(ServiceSchema).min(1)
 
+/** P3.3: the services section's own copy — components never hardcode prose. */
+export const ServicesIntroSchema = z.object({
+  heading: z.string().min(1),
+  lede: z.string().min(1),
+})
+
 /* ——— P3.2: beat 7 — the human (spec §3.4) ——— */
 
 export const HumanSchema = z.object({
@@ -188,6 +194,7 @@ export type HeroContent = z.infer<typeof HeroContentSchema>
 export type FinaleContent = z.infer<typeof FinaleContentSchema>
 export type Profile = z.infer<typeof ProfileSchema>
 export type Service = z.infer<typeof ServiceSchema>
+export type ServicesIntro = z.infer<typeof ServicesIntroSchema>
 export type HumanContent = z.infer<typeof HumanSchema>
 export type StoryContent = z.infer<typeof StorySchema>
 export type Project = z.infer<typeof ProjectSchema>

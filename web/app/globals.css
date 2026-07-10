@@ -104,3 +104,36 @@ html {
     radial-gradient(55% 45% at 30% 20%, var(--color-wash-lavender) 0%, transparent 70%),
     radial-gradient(50% 50% at 75% 70%, var(--color-wash-sky) 0%, transparent 70%);
 }
+
+/* Beat 6 — service doors (P3.3, spec §3.3). The deliverables list is always
+   in the DOM; ONLY hover-capable, motion-allowing environments collapse it
+   behind a hover/focus reveal with a card lift. Touch devices and
+   prefers-reduced-motion visitors always see everything, motionless. */
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  .service-door {
+    transition:
+      transform 0.3s ease,
+      box-shadow 0.3s ease;
+  }
+  .service-door:hover,
+  .service-door:focus-within {
+    transform: translateY(-6px);
+    box-shadow: 0 20px 40px -16px color-mix(in srgb, var(--color-ink) 18%, transparent);
+  }
+  .service-door .service-door-list {
+    display: grid;
+    grid-template-rows: 0fr;
+    opacity: 0;
+    transition:
+      grid-template-rows 0.3s ease,
+      opacity 0.3s ease;
+  }
+  .service-door .service-door-list > ul {
+    overflow: hidden;
+  }
+  .service-door:hover .service-door-list,
+  .service-door:focus-within .service-door-list {
+    grid-template-rows: 1fr;
+    opacity: 1;
+  }
+}
