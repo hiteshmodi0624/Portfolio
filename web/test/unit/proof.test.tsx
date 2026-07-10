@@ -55,6 +55,22 @@ describe('Proof (beat 5)', () => {
     }
   })
 
+  it('ships the Aimers International screenshot (approved capture), still no logo', () => {
+    renderProof()
+    const aimers = proof.projects.find((project) => project.slug === 'aimers-international')
+    expect(aimers?.image).toEqual({
+      src: '/shots/aimers-international.png',
+      width: 1200,
+      height: 750,
+      alt: 'The Aimers International website, live',
+    })
+    // favicon is still unusable — the logo chip stays omitted
+    expect(aimers?.logo).toBeUndefined()
+    const shot = screen.getByRole('img', { name: 'The Aimers International website, live' })
+    expect(shot.getAttribute('src')).toBe('/shots/aimers-international.png')
+    expect(shot.getAttribute('loading')).toBe('lazy')
+  })
+
   it('does not render the results ticker (it moved to the hero)', () => {
     const { container } = renderProof()
     expect(container.querySelectorAll('dd')).toHaveLength(0)

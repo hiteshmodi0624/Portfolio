@@ -32,16 +32,32 @@ describe('Human (beat 7)', () => {
     }
   })
 
-  it('tucks the nerdy bits into a native, collapsed <details>', () => {
+  it('ships the nerdy bits open by default in a still-native <details> dark panel', () => {
     const { container } = renderHuman()
     const details = container.querySelector('details') as HTMLDetailsElement
     expect(details).not.toBeNull()
-    expect(details.open).toBe(false)
+    // open by default but still a native disclosure (collapsible for free)
+    expect(details.open).toBe(true)
+    // PDF page 9 .nerdy treatment: dark ink panel, blush mono summary
+    expect(details.className).toContain('bg-ink')
     const summary = details.querySelector('summary') as HTMLElement
     expect(summary.textContent).toBe(human.nerdyBits.label)
+    expect(summary.className).toContain('text-blush')
     for (const item of human.nerdyBits.items) {
       expect(screen.getByText(item)).toBeDefined()
     }
+  })
+
+  it('renders the Off hours chess link — new tab, safe rel, AA-dark violet mono', () => {
+    renderHuman()
+    const link = screen.getByRole('link', { name: /chess\.com\/hiteshmodi0624/ })
+    expect(link.getAttribute('href')).toBe('https://www.chess.com/member/hiteshmodi0624')
+    expect(link.getAttribute('target')).toBe('_blank')
+    expect(link.getAttribute('rel')).toBe('noopener noreferrer')
+    expect(link.textContent).toMatch(/ ↗$/)
+    // #7C5CFF fails 4.5:1 at small mono size on the glass card; the
+    // branch-established darker violet (see proof.tsx url pill) passes
+    expect(link.className).toContain('text-[#6741D9]')
   })
 
   it('never pins: plain section, no sticky, no inline height', () => {
