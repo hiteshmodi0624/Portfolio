@@ -57,8 +57,35 @@ export function Proof({ proof, ticker }: ProofProps) {
               <motion.div style={parallax && index % 2 === 1 ? { y: drift } : undefined} className="h-full">
                 <TiltCard restRotate={REST_ROTATIONS[index % REST_ROTATIONS.length]} className="h-full">
                   <GlassCard className="flex h-full flex-col p-6 text-left">
+                    {project.image ? (
+                      <div className="mb-4 -rotate-1 overflow-hidden rounded-xl border border-white/60 shadow-md shadow-ink/10">
+                        {/* eslint-disable-next-line @next/next/no-img-element -- committed
+                            static asset; explicit dims prevent CLS (spec §3.5) */}
+                        <img
+                          src={project.image.src}
+                          alt={project.image.alt}
+                          width={project.image.width}
+                          height={project.image.height}
+                          loading="lazy"
+                          className="h-auto w-full"
+                        />
+                      </div>
+                    ) : null}
                     <div className="flex items-baseline justify-between gap-2">
-                      <h3 className="font-display text-xl font-semibold text-ink">{project.name}</h3>
+                      <div className="flex items-center gap-2">
+                        {project.logo ? (
+                          // eslint-disable-next-line @next/next/no-img-element -- committed favicon chip
+                          <img
+                            src={project.logo.src}
+                            alt={project.logo.alt}
+                            width={20}
+                            height={20}
+                            loading="lazy"
+                            className="h-5 w-5 rounded"
+                          />
+                        ) : null}
+                        <h3 className="font-display text-xl font-semibold text-ink">{project.name}</h3>
+                      </div>
                       {project.kind === 'client' ? (
                         <span className="rounded-full bg-wash-sky px-2.5 py-0.5 text-xs text-muted">
                           client work

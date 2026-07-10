@@ -1,6 +1,7 @@
 import { render, screen } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
 import { Proof } from '../../components/beats/proof'
+import { ProofSchema, type ProofContent } from '../../content/schema'
 import { proof } from '../../content/projects'
 import { ticker } from '../../content/ticker'
 
@@ -49,5 +50,48 @@ describe('Proof (beat 5)', () => {
     for (const item of ticker) {
       expect(screen.getByText(item.label)).toBeDefined()
     }
+  })
+})
+
+describe('Proof gallery visuals (P3.4)', () => {
+  const galleryFixture: ProofContent = ProofSchema.parse({
+    heading: 'Built before. Shipped before.',
+    lede: 'Fixture lede.',
+    projects: [
+      {
+        slug: 'with-image',
+        name: 'With Image',
+        tagline: 't',
+        outcome: 'o',
+        url: 'https://example.com',
+        kind: 'product',
+        image: { src: '/shots/with-image.png', width: 1200, height: 750, alt: 'With Image — live site' },
+        logo: { src: '/logos/with-image.png', alt: 'With Image logo' },
+      },
+      { slug: 'text-only', name: 'Text Only', tagline: 't', outcome: 'o', kind: 'product' },
+    ],
+  })
+
+  it('renders a lazy screenshot header with explicit dimensions when image is present', () => {
+    render(<Proof proof={galleryFixture} ticker={ticker} />)
+    const shot = screen.getByRole('img', { name: 'With Image — live site' })
+    expect(shot.getAttribute('src')).toBe('/shots/with-image.png')
+    expect(shot.getAttribute('loading')).toBe('lazy')
+    expect(shot.getAttribute('width')).toBe('1200')
+    expect(shot.getAttribute('height')).toBe('750')
+  })
+
+  it('renders a logo chip beside the name when logo is present', () => {
+    render(<Proof proof={galleryFixture} ticker={ticker} />)
+    const logo = screen.getByRole('img', { name: 'With Image logo' })
+    expect(logo.getAttribute('src')).toBe('/logos/with-image.png')
+    expect(logo.getAttribute('loading')).toBe('lazy')
+  })
+
+  it('falls back to text-only when image and logo are absent', () => {
+    const { container } = render(<Proof proof={galleryFixture} ticker={ticker} />)
+    expect(screen.getByRole('heading', { level: 3, name: 'Text Only' })).toBeDefined()
+    // exactly two imgs in the whole gallery: the fixture's screenshot + logo
+    expect(container.querySelectorAll('img')).toHaveLength(2)
   })
 })

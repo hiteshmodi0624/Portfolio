@@ -409,8 +409,9 @@ test.describe('TiltCard — mouse-only tilt', () => {
     const proof = page.locator('section[aria-label="Proof"]')
     await proof.scrollIntoViewIfNeeded()
     // No data-testid on the card; anchor on the project heading and walk up
-    // to the TiltCard root (3 ancestors: title row → GlassCard → TiltCard).
-    const card = proof.getByRole('heading', { name: 'Extrack', exact: true }).locator('xpath=ancestor::div[3]')
+    // to the TiltCard root (4 ancestors since P3.4's name-row wrapper:
+    // name row → title row → GlassCard → TiltCard).
+    const card = proof.getByRole('heading', { name: 'Extrack', exact: true }).locator('xpath=ancestor::div[4]')
 
     const resting = await card.evaluate((el) => getComputedStyle(el).transform)
 
@@ -437,7 +438,7 @@ test.describe('TiltCard — mouse-only tilt', () => {
       await touchProof.scrollIntoViewIfNeeded()
       const touchCard = touchProof
         .getByRole('heading', { name: 'Extrack', exact: true })
-        .locator('xpath=ancestor::div[3]')
+        .locator('xpath=ancestor::div[4]')
       const touchResting = await touchCard.evaluate((el) => getComputedStyle(el).transform)
       const touchBox = (await touchCard.boundingBox())!
       await touchPage.touchscreen.tap(touchBox.x + touchBox.width * 0.85, touchBox.y + touchBox.height * 0.15)
