@@ -68,6 +68,37 @@ async function captureOne(page: Page, target: { slug: string; url: string }): Pr
   console.log(`capture-shots: ${target.slug} — logo saved`)
 }
 
+/**
+ * Captures one target inside its own try/finally so ANY failure for that
+ * target — including `context.newPage()` itself throwing (e.g. a crashed
+ * renderer/context after a previous target's heavy site) — is caught and
+ * skipped here, never propagating out of main()'s loop and aborting the
+ * whole run. Returns whether the capture succeeded. Exported so the
+ * per-site-failure-isolation behavior is unit-testable without spinning up
+ * a real browser.
+ */
+export async function captureTarget(
+  context: { newPage: () => Promise<Page> },
+  target: { slug: string; url: string },
+): Promise<boolean> {
+  // Declared outside the try so `finally` can close it — but only assigned
+  // once newPage() actually succeeds, so a newPage() failure has nothing to
+  // clean up.
+  let page: Page | undefined
+  try {
+    page = await context.newPage()
+    await captureOne(page, target)
+    return true
+  } catch (error) {
+    console.warn(
+      `capture-shots: SKIPPED ${target.slug} (${error instanceof Error ? error.message : 'unknown error'}) — card stays text-only`,
+    )
+    return false
+  } finally {
+    await page?.close()
+  }
+}
+
 async function main(): Promise<void> {
   mkdirSync(path.join(PUBLIC_DIR, 'shots'), { recursive: true })
   mkdirSync(path.join(PUBLIC_DIR, 'logos'), { recursive: true })
@@ -75,17 +106,7 @@ async function main(): Promise<void> {
   const context = await browser.newContext({ viewport: VIEWPORT, deviceScaleFactor: 1 })
   let captured = 0
   for (const target of TARGETS) {
-    const page = await context.newPage()
-    try {
-      await captureOne(page, target)
-      captured += 1
-    } catch (error) {
-      console.warn(
-        `capture-shots: SKIPPED ${target.slug} (${error instanceof Error ? error.message : 'unknown error'}) — card stays text-only`,
-      )
-    } finally {
-      await page.close()
-    }
+    if (await captureTarget(context, target)) captured += 1
   }
   await browser.close()
   console.log(`capture-shots: done — ${captured}/${TARGETS.length} sites captured`)

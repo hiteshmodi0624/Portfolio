@@ -6,7 +6,7 @@ import { proof } from '../../content/projects'
 // (TARGETS, resolveIconUrl) never touches it. main() is argv-guarded.
 vi.mock('@playwright/test', () => ({ chromium: {} }))
 
-import { TARGETS, VIEWPORT, resolveIconUrl } from '../../scripts/capture-shots'
+import { TARGETS, VIEWPORT, resolveIconUrl, captureTarget } from '../../scripts/capture-shots'
 
 describe('capture-shots targets', () => {
   it('stays in lockstep with content/projects.ts (every linked project, same order)', () => {
@@ -18,6 +18,23 @@ describe('capture-shots targets', () => {
 
   it('captures at the spec dimensions', () => {
     expect(VIEWPORT).toEqual({ width: 1200, height: 750 })
+  })
+})
+
+describe('captureTarget (per-site failure isolation)', () => {
+  it('does not throw the whole run when context.newPage() itself rejects', async () => {
+    const context = { newPage: vi.fn().mockRejectedValue(new Error('context crashed')) }
+    const result = await captureTarget(context, { slug: 'extrack', url: 'https://myextrack.com' })
+    expect(result).toBe(false)
+  })
+
+  it('still closes the page when capture fails after the page was created', async () => {
+    const close = vi.fn().mockResolvedValue(undefined)
+    const page = { goto: vi.fn().mockRejectedValue(new Error('nav failed')), close }
+    const context = { newPage: vi.fn().mockResolvedValue(page) }
+    const result = await captureTarget(context, { slug: 'extrack', url: 'https://myextrack.com' })
+    expect(result).toBe(false)
+    expect(close).toHaveBeenCalledTimes(1)
   })
 })
 
