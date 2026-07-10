@@ -38,9 +38,22 @@ describe('Proof (beat 5)', () => {
     expect(link.getAttribute('target')).toBe('_blank')
   })
 
-  it('marks the four client-work entries with the client pill', () => {
+  it('labels every card by kind: four client-work chips, four my-own-product chips', () => {
     renderProof()
     expect(screen.getAllByText('client work')).toHaveLength(4)
+    expect(screen.getAllByText('my own product')).toHaveLength(4)
+  })
+
+  it('renders a url pill on every card: www-stripped hostname, new tab, safe rel', () => {
+    renderProof()
+    const pills = screen.getAllByRole('link')
+    expect(pills).toHaveLength(proof.projects.length)
+    for (const pill of pills) {
+      expect(pill.getAttribute('target')).toBe('_blank')
+      expect(pill.getAttribute('rel')).toBe('noopener noreferrer')
+      expect(pill.textContent).toMatch(/^[a-z0-9.-]+ ↗$/)
+      expect(pill.textContent).not.toContain('www.')
+    }
   })
 
   it('renders the results ticker at final values with its labels', () => {

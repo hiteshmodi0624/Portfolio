@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest'
+import * as caseStudies from '../../content/case-studies'
 import * as human from '../../content/human'
 import * as profile from '../../content/profile'
 import * as projects from '../../content/projects'
@@ -9,7 +10,7 @@ import * as ticker from '../../content/ticker'
 /** Copy sweep guard: user-visible site copy never carries an em dash
  * (U+2014) — the approved PDF-portfolio voice uses plain punctuation
  * instead. En dashes in numeric ranges ('3–4 weeks') stay legal. */
-const modules = { human, profile, projects, services, story, ticker }
+const modules = { 'case-studies': caseStudies, human, profile, projects, services, story, ticker }
 
 interface FoundString {
   path: string

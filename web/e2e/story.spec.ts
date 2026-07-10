@@ -10,8 +10,10 @@ const BEATS = [
 /** Desktop page-height budget in viewport-heights (spec §6 P3.1). The old
  * pinned page ran ~13 viewports of runway; unpinning drops it below 8.
  * Raised by ~1 per NEW CONTENT SECTION as P3.2 (human) and P3.3 (services)
- * land — the budget guards against pinned emptiness, not against content. */
-const MAX_PAGE_VIEWPORTS = 10
+ * land — the budget guards against pinned emptiness, not against content.
+ * Content refresh P2 adds the case-studies beat: four full case layouts,
+ * roughly one viewport each on desktop, hence +4. */
+const MAX_PAGE_VIEWPORTS = 14
 
 /** Scroll a section's top to the viewport top, instantly (the site sets
  * scroll-behavior: smooth; tests must not animate there), ONCE — the
@@ -35,6 +37,7 @@ test.describe('story beats 2–5 (content)', () => {
       'The chaos',
       'The turn',
       'The storefront',
+      'Case studies',
       'Proof',
       'Services',
       'The human',

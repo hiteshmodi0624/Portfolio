@@ -37,6 +37,55 @@ test.describe('finale (beat 8)', () => {
   })
 })
 
+test.describe('case studies (content refresh P2)', () => {
+  test('four deep cases render with chips, stats, and live links', async ({ page }) => {
+    await page.goto('/')
+    const section = page.locator('section[aria-label="Case studies"]')
+    await section.scrollIntoViewIfNeeded()
+    await expect(section.getByRole('heading', { level: 2 })).toHaveText('Four builds, up close')
+
+    const caseHeadings = section.getByRole('heading', { level: 3 })
+    await expect(caseHeadings).toHaveCount(4)
+    for (const heading of [
+      'Helping mariners find safe water, a million times a day.',
+      'A quiet watchtower for your business numbers.',
+      'From idea to paying customers in 15 days.',
+      'Course creation used to take a month. Now it takes ten days.',
+    ]) {
+      await expect(section.getByRole('heading', { level: 3, name: heading })).toHaveText(heading)
+    }
+
+    // category chips, one per case (two share the "My own product" family)
+    for (const chip of [
+      'Client project · United States',
+      'My own product · AI for startups',
+      'My own product · Fintech',
+      'Product engineering · EdTech',
+    ]) {
+      await expect(section.getByText(chip, { exact: true })).toHaveCount(1)
+    }
+
+    // the four visit pills open the live sites safely in a new tab
+    const links = section.getByRole('link', { name: /see it live/ })
+    await expect(links).toHaveCount(4)
+    const expectedHrefs = [
+      'https://www.ditchnavigation.com',
+      'https://myquri.com',
+      'https://myextrack.com',
+      'https://whycosmos.com',
+    ]
+    for (const [index, link] of (await links.all()).entries()) {
+      await expect(link).toHaveAttribute('href', expectedHrefs[index])
+      await expect(link).toHaveAttribute('target', '_blank')
+      await expect(link).toHaveAttribute('rel', /noopener/)
+    }
+
+    // a sample stat from each end of the section
+    await expect(section.getByText('requests served, every day')).toBeAttached()
+    await expect(section.getByText('automated tests guarding the platform')).toBeAttached()
+  })
+})
+
 test('loads with no console errors', async ({ page }) => {
   const errors: string[] = []
   page.on('console', (message) => {

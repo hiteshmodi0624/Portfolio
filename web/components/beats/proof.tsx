@@ -4,6 +4,7 @@ import { motion, useReducedMotion, useScroll, useTransform } from 'motion/react'
 import { useRef } from 'react'
 import type { ProofContent, TickerItem } from '@/content/schema'
 import { fadeRise, staggerContainer } from '@/lib/motion'
+import { displayHost } from '@/lib/url'
 import { useMediaQuery } from '@/lib/use-media'
 import { CountUp } from '@/components/ui/count-up'
 import { GlassCard } from '@/components/ui/glass-card'
@@ -86,23 +87,31 @@ export function Proof({ proof, ticker }: ProofProps) {
                         ) : null}
                         <h3 className="font-display text-xl font-semibold text-ink">{project.name}</h3>
                       </div>
-                      {project.kind === 'client' ? (
-                        <span className="rounded-full bg-wash-sky px-2.5 py-0.5 text-xs text-muted">
-                          client work
-                        </span>
-                      ) : null}
+                      {/* every card wears a kind chip, PDF chip palette:
+                          client = sky wash, own product = lavender wash */}
+                      <span
+                        className={`shrink-0 whitespace-nowrap rounded-full border px-2.5 py-0.5 text-xs ${
+                          project.kind === 'client'
+                            ? 'border-sky/40 bg-wash-sky text-[#1C7ED6]'
+                            : 'border-violet/35 bg-wash-lavender text-violet'
+                        }`}
+                      >
+                        {project.kind === 'client' ? 'client work' : 'my own product'}
+                      </span>
                     </div>
                     <p className="mt-1 text-sm text-muted">{project.tagline}</p>
                     <p className="mt-4 text-sm font-medium text-ink">{project.outcome}</p>
                     {project.url ? (
-                      <a
-                        href={project.url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="mt-auto pt-4 font-mono text-xs text-muted underline underline-offset-4 transition hover:text-ink"
-                      >
-                        {new URL(project.url).hostname} ↗
-                      </a>
+                      <div className="mt-auto pt-4">
+                        <a
+                          href={project.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-block rounded-full bg-wash-lavender px-3.5 py-1.5 font-mono text-xs font-semibold text-violet transition hover:bg-violet hover:text-white"
+                        >
+                          {displayHost(project.url)} ↗
+                        </a>
+                      </div>
                     ) : null}
                   </GlassCard>
                 </TiltCard>

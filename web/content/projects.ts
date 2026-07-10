@@ -70,7 +70,7 @@ export const proof: ProofContent = ProofSchema.parse({
       slug: 'aimers-international',
       name: 'Aimers International',
       tagline: 'The public face of an international consultancy',
-      outcome: 'Client work, from first sketch to live site',
+      outcome: 'Taken from first sketch to live site',
       url: 'https://www.aimersinternational.com',
       kind: 'client',
       // capture-shots skipped this site (favicon fetch threw — "Request
@@ -82,7 +82,7 @@ export const proof: ProofContent = ProofSchema.parse({
       slug: 'fidus-global',
       name: 'Fidus Global',
       tagline: 'A business site that gets to the point',
-      outcome: 'Client work, shipped and maintained',
+      outcome: 'Shipped, and still maintained today',
       url: 'https://www.fidusglobal.in',
       kind: 'client',
       image: { src: '/shots/fidus-global.png', width: 1200, height: 750, alt: 'The Fidus Global website, live' },
@@ -91,8 +91,8 @@ export const proof: ProofContent = ProofSchema.parse({
     {
       slug: 'rtopilot',
       name: 'RTOPilot',
-      tagline: 'Runs the paperwork for Australian training providers',
-      outcome: 'Heavy compliance admin, handled quietly',
+      tagline: 'Runs enrolments, schedules and invoices for Australian training providers',
+      outcome: 'Saves the team 15+ hours of admin every week',
       url: 'https://www.rtopilot.com.au',
       kind: 'client',
       image: { src: '/shots/rtopilot.png', width: 1200, height: 750, alt: 'The RTOPilot website, live' },

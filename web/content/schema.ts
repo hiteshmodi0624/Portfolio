@@ -142,6 +142,44 @@ export const StorySchema = z.object({
   }),
 })
 
+/* ——— Content refresh P2: deep case studies (PDF portfolio pages 4–7) ——— */
+
+/** Committed screenshot from scripts/capture-shots.ts — same shape as
+ * ProjectSchema's image, but REQUIRED: a case study never renders text-only. */
+const caseShot = z.object({
+  src: z.string().regex(/^\/shots\/[a-z0-9-]+\.(png|webp)$/),
+  width: z.number().int().positive(),
+  height: z.number().int().positive(),
+  alt: z.string().min(1),
+})
+
+export const CaseStudySchema = z.object({
+  slug: z.string().regex(/^[a-z][a-z0-9-]*$/),
+  heading: z.string().min(1),
+  /** Rendered as a tinted chip; tone maps to the pastel wash palette. */
+  category: z.object({
+    label: z.string().min(1),
+    tone: z.enum(['sky', 'violet', 'blush']),
+  }),
+  /** Freeform labelled prose blocks — the PDF varies them per case
+   * ('The problem' / 'What I built' / 'The outcome', 'The idea', …). */
+  blocks: z
+    .array(z.object({ label: z.string().min(1), body: z.string().min(1) }))
+    .min(3),
+  /** Exactly three stat cards per case, like the PDF's .case-stats row. */
+  stats: z.array(z.object({ value: z.string().min(1), label: z.string().min(1) })).length(3),
+  url: httpsUrl,
+  /** The mono tech line under the browser frame. */
+  tech: z.string().min(1),
+  image: caseShot,
+})
+
+export const CasesSchema = z.object({
+  heading: z.string().min(1),
+  lede: z.string().min(1),
+  items: z.array(CaseStudySchema).min(1),
+})
+
 /* ——— P2: beat 5 proof gallery (spec §3) ——— */
 
 export const ProjectSchema = z.object({
@@ -217,6 +255,8 @@ export type Service = z.infer<typeof ServiceSchema>
 export type ServicesIntro = z.infer<typeof ServicesIntroSchema>
 export type HumanContent = z.infer<typeof HumanSchema>
 export type StoryContent = z.infer<typeof StorySchema>
+export type CaseStudy = z.infer<typeof CaseStudySchema>
+export type CasesContent = z.infer<typeof CasesSchema>
 export type Project = z.infer<typeof ProjectSchema>
 export type ProofContent = z.infer<typeof ProofSchema>
 export type Stats = z.infer<typeof StatsSchema>
