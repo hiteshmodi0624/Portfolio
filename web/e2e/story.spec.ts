@@ -11,7 +11,7 @@ const BEATS = [
  * pinned page ran ~13 viewports of runway; unpinning drops it below 8.
  * Raised by ~1 per NEW CONTENT SECTION as P3.2 (human) and P3.3 (services)
  * land — the budget guards against pinned emptiness, not against content. */
-const MAX_PAGE_VIEWPORTS = 9
+const MAX_PAGE_VIEWPORTS = 10
 
 /** Scroll a section's top to the viewport top, instantly (the site sets
  * scroll-behavior: smooth; tests must not animate there), ONCE — the
@@ -36,6 +36,7 @@ test.describe('story beats 2–5 (content)', () => {
       'The turn',
       'The storefront',
       'Proof',
+      'Services',
       'The human',
       'Contact',
     ])
@@ -285,6 +286,69 @@ test.describe('human (beat 7, P3.2)', () => {
     await section.locator('summary').click()
     await expect(details).toHaveAttribute('open', '')
     await expect(section.getByText(/MCP servers/)).toBeVisible()
+  })
+})
+
+test.describe('services (beat 6, P3.3)', () => {
+  test('renders exactly three doors — heading, timeline, #finale CTA, no prices', async ({
+    page,
+  }) => {
+    await page.goto('/')
+    const section = page.locator('section[aria-label="Services"]')
+    await section.scrollIntoViewIfNeeded()
+    await expect(section.getByRole('heading', { level: 3 })).toHaveCount(3)
+    for (const door of [
+      { title: 'The Landing Page', timeline: 'about 2 weeks' },
+      { title: 'The AI Employee', timeline: '3–4 weeks' },
+      { title: 'The Full Build', timeline: '6–10 weeks' },
+    ]) {
+      await expect(section.getByRole('heading', { level: 3, name: door.title })).toBeVisible()
+      await expect(section.getByText(door.timeline)).toBeVisible()
+    }
+    const ctas = section.getByRole('link', { name: 'Book a call' })
+    await expect(ctas).toHaveCount(3)
+    for (const cta of await ctas.all()) {
+      await expect(cta).toHaveAttribute('href', '#finale')
+    }
+    const text = await section.textContent()
+    expect(text).not.toMatch(/\$|₹|€|price/i)
+  })
+
+  test('desktop hover reveals the what-you-get list', async ({ page, isMobile }) => {
+    test.skip(Boolean(isMobile), 'touch devices always show the list — covered below')
+    await page.goto('/')
+    const section = page.locator('section[aria-label="Services"]')
+    await section.scrollIntoViewIfNeeded()
+    const firstDeliverable = section.getByText(
+      'A hand-crafted page designed around one goal: turning visitors into enquiries',
+    )
+    // collapsed before hover on a hover-capable, motion-allowing viewport
+    await expect(firstDeliverable).not.toBeVisible()
+    await section.getByRole('heading', { name: 'The Landing Page' }).hover()
+    await expect(firstDeliverable).toBeVisible()
+  })
+
+  test('touch viewports always show the list — no hover required', async ({ page, isMobile }) => {
+    test.skip(!isMobile, 'touch behavior is proven on the mobile project')
+    await page.goto('/')
+    const section = page.locator('section[aria-label="Services"]')
+    const firstDeliverable = section.getByText(
+      'A hand-crafted page designed around one goal: turning visitors into enquiries',
+    )
+    await firstDeliverable.scrollIntoViewIfNeeded()
+    await expect(firstDeliverable).toBeVisible()
+  })
+
+  test('reduced motion always shows the list — no hover required', async ({ page, isMobile }) => {
+    test.skip(Boolean(isMobile), 'proven once on desktop with emulated reduced motion')
+    await page.emulateMedia({ reducedMotion: 'reduce' })
+    await page.goto('/')
+    const section = page.locator('section[aria-label="Services"]')
+    const firstDeliverable = section.getByText(
+      'A hand-crafted page designed around one goal: turning visitors into enquiries',
+    )
+    await firstDeliverable.scrollIntoViewIfNeeded()
+    await expect(firstDeliverable).toBeVisible()
   })
 })
 
