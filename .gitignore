@@ -33,3 +33,4 @@ npm-debug.log*
 .serena/
 infra/cdk-outputs.json
 infra/dns-outputs.json
+assets/pdf-portfolio/
