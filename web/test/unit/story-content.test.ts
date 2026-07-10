@@ -153,6 +153,24 @@ describe('ProjectSchema / ProjectsSchema', () => {
       }).success,
     ).toBe(false)
   })
+
+  it('rejects an image with a valid path but unsupported extension', () => {
+    expect(
+      ProjectSchema.safeParse({
+        ...baseProject,
+        image: { src: '/shots/extrack.gif', width: 1200, height: 800, alt: 'Extrack dashboard' },
+      }).success,
+    ).toBe(false)
+  })
+
+  it('rejects a logo with a valid path but unsupported extension', () => {
+    expect(
+      ProjectSchema.safeParse({
+        ...baseProject,
+        logo: { src: '/logos/extrack.jpg', alt: 'Extrack logo' },
+      }).success,
+    ).toBe(false)
+  })
 })
 
 describe('shipped story content', () => {
