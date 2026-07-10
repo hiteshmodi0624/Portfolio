@@ -20,13 +20,13 @@ export default function HomePage() {
   return (
     <MotionProvider>
       <main>
-        <Hero hero={profile.hero} />
+        <Hero hero={profile.hero} ticker={ticker} />
         <Chaos chaos={story.chaos} />
         {/* the page hands beat-2's cards to beat 3 — beats never import beats */}
         <Turn turn={story.turn} cards={story.chaos.cards} />
         <Storefront storefront={story.storefront} />
         <Cases cases={cases} />
-        <Proof proof={proof} ticker={ticker} />
+        <Proof proof={proof} />
         <Services intro={servicesIntro} services={services} />
         <Human human={human} />
         <Finale finale={profile.finale} />

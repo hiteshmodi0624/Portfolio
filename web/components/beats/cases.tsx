@@ -49,7 +49,11 @@ function BrowserFrame({ image, host }: { image: CaseStudy['image']; host: string
  * the screenshot stacks first. All copy flows from content/case-studies.ts. */
 export function Cases({ cases }: CasesProps) {
   return (
-    <section aria-label="Case studies" className="relative overflow-x-clip px-6 py-24">
+    <section
+      id="work"
+      aria-label="Case studies"
+      className="relative overflow-x-clip px-6 py-24"
+    >
       <div className="mx-auto max-w-5xl">
         <motion.header
           variants={fadeRise}

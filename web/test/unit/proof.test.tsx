@@ -3,10 +3,9 @@ import { describe, expect, it } from 'vitest'
 import { Proof } from '../../components/beats/proof'
 import { ProofSchema, type ProofContent } from '../../content/schema'
 import { proof } from '../../content/projects'
-import { ticker } from '../../content/ticker'
 
 describe('Proof (beat 5)', () => {
-  const renderProof = () => render(<Proof proof={proof} ticker={ticker} />)
+  const renderProof = () => render(<Proof proof={proof} />)
 
   it('renders the heading and lede', () => {
     renderProof()
@@ -56,15 +55,11 @@ describe('Proof (beat 5)', () => {
     }
   })
 
-  it('renders the results ticker at final values with its labels', () => {
+  it('does not render the results ticker (it moved to the hero)', () => {
     const { container } = renderProof()
-    const values = Array.from(container.querySelectorAll('dd')).map((dd) =>
-      dd.textContent?.trim(),
-    )
-    expect(values).toEqual(['15 days', '1M+', '4'])
-    for (const item of ticker) {
-      expect(screen.getByText(item.label)).toBeDefined()
-    }
+    expect(container.querySelectorAll('dd')).toHaveLength(0)
+    expect(screen.queryByText('15 days')).toBeNull()
+    expect(screen.queryByText('from idea to paying customers')).toBeNull()
   })
 })
 
@@ -96,7 +91,7 @@ describe('Proof gallery visuals (P3.4)', () => {
   })
 
   it('renders a lazy screenshot header with explicit dimensions when image is present', () => {
-    render(<Proof proof={galleryFixture} ticker={ticker} />)
+    render(<Proof proof={galleryFixture} />)
     const shot = screen.getByRole('img', { name: 'With Image — live site' })
     expect(shot.getAttribute('src')).toBe('/shots/with-image.png')
     expect(shot.getAttribute('loading')).toBe('lazy')
@@ -105,14 +100,14 @@ describe('Proof gallery visuals (P3.4)', () => {
   })
 
   it('renders a logo chip beside the name when logo is present', () => {
-    render(<Proof proof={galleryFixture} ticker={ticker} />)
+    render(<Proof proof={galleryFixture} />)
     const logo = screen.getByRole('img', { name: 'With Image logo' })
     expect(logo.getAttribute('src')).toBe('/logos/with-image.png')
     expect(logo.getAttribute('loading')).toBe('lazy')
   })
 
   it('renders a logo chip without a screenshot header when only logo is present', () => {
-    render(<Proof proof={galleryFixture} ticker={ticker} />)
+    render(<Proof proof={galleryFixture} />)
     const logo = screen.getByRole('img', { name: 'Logo Only logo' })
     expect(logo.getAttribute('src')).toBe('/logos/logo-only.png')
     expect(logo.getAttribute('loading')).toBe('lazy')
@@ -127,7 +122,7 @@ describe('Proof gallery visuals (P3.4)', () => {
   })
 
   it('falls back to text-only when image and logo are absent', () => {
-    const { container } = render(<Proof proof={galleryFixture} ticker={ticker} />)
+    const { container } = render(<Proof proof={galleryFixture} />)
     expect(screen.getByRole('heading', { level: 3, name: 'Text Only' })).toBeDefined()
     // exactly three imgs in the whole gallery: with-image's screenshot + its
     // logo, plus logo-only's logo chip — text-only contributes none

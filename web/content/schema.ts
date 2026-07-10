@@ -8,14 +8,22 @@ const httpsUrl = z
 /** Committed, EXIF-stripped asset under public/images/. Shared validator for HeroContentSchema identity photo and HumanSchema photo. */
 const imageSrc = z.string().regex(/^\/images\/[a-z0-9.-]+\.(jpg|jpeg|png|webp)$/)
 
+/** In-page anchor like "#finale" or "#work" — CTAs never leave the page. */
+const anchorHref = z.string().regex(/^#[a-z][a-z-]*$/)
+
 export const HeroContentSchema = z.object({
   h1: z.string().min(1),
   sub: z.string().min(1),
   availability: z.string().min(1),
   ctaLabel: z.string().min(1),
-  /** In-page anchor the CTA and scroll cue jump to, e.g. "#finale". */
-  ctaHref: z.string().regex(/^#[a-z][a-z-]*$/),
-  scrollCue: z.string().min(1),
+  /** In-page anchor the primary CTA jumps to, e.g. "#finale". */
+  ctaHref: anchorHref,
+  /** P4 hero redesign: quieter second path ("See the work ↓" → #work).
+   * Replaces the old standalone scrollCue — one downward invitation, not two. */
+  secondaryCta: z.object({
+    label: z.string().min(1),
+    href: anchorHref,
+  }),
   /** P3.2 hero identity: photo chip + name line under the subhead. */
   identity: z.object({
     name: z.string().min(1),

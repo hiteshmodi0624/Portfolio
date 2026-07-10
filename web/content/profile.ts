@@ -11,7 +11,7 @@ export const profile: Profile = ProfileSchema.parse({
     availability: 'Available for new projects',
     ctaLabel: 'Start your project',
     ctaHref: '#finale',
-    scrollCue: 'show me how ↓',
+    secondaryCta: { label: 'See the work ↓', href: '#work' },
     identity: {
       name: 'Hitesh Modi',
       line: 'builds these end-to-end, replies same day',
