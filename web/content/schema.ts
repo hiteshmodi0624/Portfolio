@@ -5,6 +5,9 @@ const httpsUrl = z
   .url()
   .refine((value) => value.startsWith('https://'), { message: 'outbound links must be https' })
 
+/** Committed, EXIF-stripped asset under public/images/. Shared validator for HeroContentSchema identity photo and HumanSchema photo. */
+const imageSrc = z.string().regex(/^\/images\/[a-z0-9.-]+\.(jpg|jpeg|png|webp)$/)
+
 export const HeroContentSchema = z.object({
   h1: z.string().min(1),
   sub: z.string().min(1),
@@ -19,7 +22,7 @@ export const HeroContentSchema = z.object({
     line: z.string().min(1),
     photo: z.object({
       /** Committed, EXIF-stripped asset under public/images/ (never the original). */
-      src: z.string().regex(/^\/images\/[a-z0-9.-]+\.(jpg|jpeg|png|webp)$/),
+      src: imageSrc,
       alt: z.string().min(1),
     }),
   }),
@@ -71,7 +74,7 @@ export const HumanSchema = z.object({
   }),
   photo: z.object({
     /** Committed, EXIF-stripped asset under public/images/ (never the original). */
-    src: z.string().regex(/^\/images\/[a-z0-9.-]+\.(jpg|jpeg|png|webp)$/),
+    src: imageSrc,
     alt: z.string().min(1),
     /** Intrinsic pixel dimensions — rendered as width/height attrs (no CLS). */
     width: z.number().int().positive(),
@@ -151,6 +154,23 @@ export const ProjectSchema = z.object({
    * mechanism, in use since 2026-07-10) — append new client sites to
    * content/projects.ts as they go live; no component changes needed. */
   kind: z.enum(['product', 'client']),
+  /** P3.4: committed screenshot from scripts/capture-shots.ts. Optional —
+   * a card without one renders text-only. Explicit dimensions = no CLS. */
+  image: z
+    .object({
+      src: z.string().regex(/^\/shots\/[a-z0-9-]+\.(png|webp)$/),
+      width: z.number().int().positive(),
+      height: z.number().int().positive(),
+      alt: z.string().min(1),
+    })
+    .optional(),
+  /** P3.4: committed favicon chip. Optional — omitted when unusable (spec §7). */
+  logo: z
+    .object({
+      src: z.string().regex(/^\/logos\/[a-z0-9-]+\.(png|webp)$/),
+      alt: z.string().min(1),
+    })
+    .optional(),
 })
 
 export const ProjectsSchema = z.array(ProjectSchema).min(1)

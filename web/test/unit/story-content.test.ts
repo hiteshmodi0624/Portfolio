@@ -101,6 +101,58 @@ describe('ProjectSchema / ProjectsSchema', () => {
       expect(client.url?.startsWith('https://')).toBe(true)
     }
   })
+
+  const baseProject = {
+    slug: 'extrack',
+    name: 'Extrack',
+    tagline: 't',
+    outcome: 'o',
+    url: 'https://myextrack.com',
+    kind: 'product',
+  }
+
+  it('accepts a project without image/logo (text-only fallback, P3.4)', () => {
+    expect(ProjectSchema.safeParse(baseProject).success).toBe(true)
+  })
+
+  it('accepts a project with image and logo (P3.4)', () => {
+    const withAssets = {
+      ...baseProject,
+      image: { src: '/shots/extrack.png', width: 1200, height: 750, alt: 'Extrack — live site' },
+      logo: { src: '/logos/extrack.png', alt: 'Extrack logo' },
+    }
+    expect(ProjectSchema.safeParse(withAssets).success).toBe(true)
+  })
+
+  it('rejects an image outside /shots/ or without dimensions', () => {
+    expect(
+      ProjectSchema.safeParse({
+        ...baseProject,
+        image: { src: 'https://cdn.example.com/x.png', width: 1200, height: 750, alt: 'x' },
+      }).success,
+    ).toBe(false)
+    expect(
+      ProjectSchema.safeParse({
+        ...baseProject,
+        image: { src: '/shots/extrack.png', alt: 'x' },
+      }).success,
+    ).toBe(false)
+  })
+
+  it('rejects a logo outside /logos/ or without alt', () => {
+    expect(
+      ProjectSchema.safeParse({
+        ...baseProject,
+        logo: { src: '/images/extrack.png', alt: 'Extrack logo' },
+      }).success,
+    ).toBe(false)
+    expect(
+      ProjectSchema.safeParse({
+        ...baseProject,
+        logo: { src: '/logos/extrack.png', alt: '' },
+      }).success,
+    ).toBe(false)
+  })
 })
 
 describe('shipped story content', () => {
