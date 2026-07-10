@@ -11,13 +11,20 @@
 // BUDGET_KB to 160 in a commit that pastes the measured table (see
 // docs/superpowers/plans/2026-07-10-freelance-portfolio-p2.md, Task 1).
 // Above 158 KB: cut scene code (TypedText first), never raise again.
+//
+// BUDGET RAISED (2026-07-10, P2 Task 11 final verification): measured
+// 154.3 KB gz, inside the pre-approved 150–158 KB band → raised to 160 per
+// the ladder above. Justification: all 6 beats ship on one static page, the
+// scroll-scene motion engine is shared across every beat (no per-beat
+// duplication), and P2 added zero new runtime dependencies. See the commit
+// message for the full measured per-chunk table.
 
 import { readFileSync } from 'node:fs'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { gzipSync } from 'node:zlib'
 
-const BUDGET_KB = Number(process.env.BUDGET_KB ?? 150)
+const BUDGET_KB = Number(process.env.BUDGET_KB ?? 160)
 const outDir = path.join(path.dirname(fileURLToPath(import.meta.url)), '..', 'out')
 
 const html = readFileSync(path.join(outDir, 'index.html'), 'utf8')

@@ -200,7 +200,7 @@ export function Turn({ turn, cards }: TurnProps) {
         <div className="relative flex flex-col items-center px-6 py-24">
           <div aria-hidden="true" className="calm-wash" />
           <TurnHeader turn={turn} />
-          <div className="mt-10 flex w-full max-w-xs flex-col gap-2">
+          <div aria-hidden="true" className="mt-10 flex w-full max-w-xs flex-col gap-2">
             {stack.map((card) => (
               <div
                 key={card.id}
