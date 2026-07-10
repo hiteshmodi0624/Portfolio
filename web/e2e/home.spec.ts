@@ -29,7 +29,9 @@ test.describe('finale (beat 8)', () => {
     await expect(mail).toHaveAttribute('href', 'mailto:mail@hiteshmodi.in')
     const cal = page.getByRole('link', { name: 'Book a call' })
     await expect(cal).toHaveAttribute('href', 'https://cal.com/hiteshmodi')
-    await expect(page.getByRole('heading', { level: 2 })).toContainText("Let's build your magic")
+    await expect(page.locator('#finale').getByRole('heading', { level: 2 })).toContainText(
+      "Let's build your magic",
+    )
   })
 })
 
@@ -98,7 +100,7 @@ test.describe('prefers-reduced-motion', () => {
     await page.goto('/')
     await page.locator('#finale').scrollIntoViewIfNeeded()
 
-    const heading = page.getByRole('heading', { level: 2 })
+    const heading = page.locator('#finale').getByRole('heading', { level: 2 })
     const cta = page.getByRole('link', { name: 'Book a call' })
     await expect(heading).toBeVisible()
     await expect(cta).toBeVisible()
