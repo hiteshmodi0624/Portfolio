@@ -84,6 +84,25 @@ describe('TypedText (P3.1 — timer-driven)', () => {
     }
   })
 
+  it('clears its interval once typing completes — no zombie timers', () => {
+    vi.useFakeTimers()
+    try {
+      const { container } = render(
+        <TypedText text="Hi" play reducedMotion={false} startDelayMs={0} msPerChar={20} />,
+      )
+      // start delay + both chars + generous slack past completion
+      act(() => {
+        vi.advanceTimersByTime(20 * 2 + 200)
+      })
+      expect(visibleText(container)).toBe('Hi')
+      // typing is done: nothing may still be ticking (a leaked setInterval
+      // would keep dispatching a no-op state-setter every msPerChar forever)
+      expect(vi.getTimerCount()).toBe(0)
+    } finally {
+      vi.useRealTimers()
+    }
+  })
+
   it('does not type before play flips true', () => {
     vi.useFakeTimers()
     try {

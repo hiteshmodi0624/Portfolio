@@ -71,17 +71,26 @@ export function TypedText({
   msPerChar = 24,
 }: TypedTextProps) {
   const [count, setCount] = useState(0)
+  // Mirrors `count` for the interval tick, so the tick that types the final
+  // character can clear its own interval (no zombie no-op ticks afterwards).
+  const countRef = useRef(0)
 
   useEffect(() => {
     if (!play) return
     if (reducedMotion) {
+      countRef.current = text.length
       setCount(text.length)
       return
     }
     let interval: ReturnType<typeof setInterval> | undefined
     const delay = setTimeout(() => {
       interval = setInterval(() => {
-        setCount((current) => (current >= text.length ? current : current + 1))
+        countRef.current = Math.min(countRef.current + 1, text.length)
+        setCount(countRef.current)
+        if (countRef.current >= text.length && interval) {
+          clearInterval(interval)
+          interval = undefined
+        }
       }, msPerChar)
     }, startDelayMs)
     return () => {
